@@ -5,7 +5,7 @@ from flask_pymongo import PyMongo
 
 
 mongo = None
-
+36
 def setup_db(app):
     app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
     mongo = PyMongo(app)
@@ -36,10 +36,11 @@ def save_data_object(table, row):
 
 def retrieve_data_from_file(df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
     df = pd.DataFrame()
+    table = "GET THE TABLE NAME NOWWW!!"
     if (df is not None) and (df.size > 0):
         for index, row in df.iterrows():
             print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-            save_data_object(row)
+            save_data_object(table, row)
     else:
         print("DATASET IS EMPTY")
         return True

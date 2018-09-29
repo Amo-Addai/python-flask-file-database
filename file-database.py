@@ -8,16 +8,17 @@ ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv', 'json',
 
 app = Flask(__name__)
 app = server.setup_db_and_file_system(app)
-
-
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+print("Server, Database, and File System have all been set up successfully!!")
 
 
 def allowed_files(filename):
     ext = filename.rsplit('.', 1)[1].lower()
     return '.' in filename and ext in ALLOWED_EXTENSIONS, ext
+
+
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -26,7 +27,6 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra = {
             'body' : request.form
         }
-        print("BODY -> {}".format(body))
         # check if the post request has the file part
         if 'file' not in request.files:
             print('No file part')

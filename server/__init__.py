@@ -13,7 +13,7 @@ def retrieve_file_from_database_or_file_system(extra):  # RETRIEVE THE DATA FROM
 
 
 def retrieve_data_from_file(df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
-    table = "GET THE TABLE NAME NOWWW!!"
+    table = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
     if (df is not None) and (df.size > 0):
         for index, row in df.iterrows():
             print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
@@ -26,18 +26,22 @@ def retrieve_data_from_file(df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE 
 
 def handle_file(file, extra):
     df = None
-    if 'file_type' in extra:
-        type = extra['file_type']
-        if type is "csv":
-            df = pd.read_csv(file)
-        elif (type is "xls") or (type is "xlsx"):
-            df = pd.read_excel(file)
-    if df is not None:
-        if retrieve_data_from_file(df):
-            #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!
-            if ("save_to_file_system" in extra) and (extra["save_to_file_system"]):
-                print("Saving file to the file system too")
-                file_system.save_file(file, extra)
-            return True
+    try:
+        if 'file_type' in extra:
+            type = extra['file_type']
+            if type == "csv":
+                df = pd.read_csv(file)
+            elif (type == "xls") or (type == "xlsx"):
+                df = pd.read_excel(file)
+        if df is not None:
+            print(df.head())
+            if retrieve_data_from_file(df):
+                #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!
+                if ("save_to_file_system" in extra) and (extra["save_to_file_system"]):
+                    print("Saving file to the file system too")
+                    file_system.save_file(file, extra)
+                return True
+    except Exception as e:
+        print("SOME ERROR OCCURRED -> {}".format(e))
     print("COULDN'T RETRIEVE DATA FROM THE FILE")
     return False

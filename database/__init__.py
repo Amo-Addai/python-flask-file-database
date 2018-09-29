@@ -9,8 +9,8 @@ DATABASE = {
     'name': "ugcs",
     'tables': ["Examination"]
 }
-mongodb = None
 db = None
+default_table = "Examination"
 
 
 def setup_db(app):
@@ -19,16 +19,14 @@ def setup_db(app):
     mongoclient = pymongo.MongoClient(MONGO_URI)
     dblist = mongoclient.list_database_names()
     print("DATABASES -> {}".format(dblist))
-    mongodb = mongoclient[name]
-    db = mongodb[name]
+    db = mongoclient[name]
     for table in DATABASE["tables"]:
-        print("CREATING DB TABLE -> {}".format(table))
-        db.createCollection(table)
+        print("Creating Database Table {} -> {}".format(table, db[table]))
     return app
 
 
-def get_data(table):
-    data = db[table].find()
+def get_data(filter=None, table=default_table):
+    data = db[table].find(filter if (filter is not None) else {})
     #   NOW, WORK WITH data HOWEVER YOU WANT
     for obj in data:  # MAKE SURE YOU UNHASH ALL THE PINS FIRST THOUGH
         if 'pin' in obj:
@@ -37,19 +35,19 @@ def get_data(table):
     return data
 
 
-def save_data_object(table, obj):
+def save_data_object(obj, table=default_table):
     print("OBJECT -> {}".format(obj))  # NOW, YOU CAN SAVE THE DATA OBJECT
     if 'pin' in obj:
         print("NOW, HASHING PIN -> {}".format(obj['pin']))
         obj['pin'] = hash_pin(obj['pin'])
-        print("HASH -> {}".format(hash))
     db[table].save(obj)
 
 
 def hash_pin(pin):  # FIND OUT THE KEY YOU'RE USING TO HASH THE PINS
     h = hashlib.md5(pin.encode())
-    hash = h.hexdigest()
-    return hash
+    hashedString = h.hexdigest()
+    print("HASH -> {}".format(hashedString))
+    return hashedString
 
 
 def unhash_pin(pin):

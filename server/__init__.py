@@ -12,13 +12,26 @@ def retrieve_file_from_database_or_file_system(extra):  # RETRIEVE THE DATA FROM
     pass
 
 
+def preprocessData(df):  # DO SOME DATA PREPROCESSING, CLEANING, etc
+    df = df.fillna("")
+    return df, None
+
+
 def retrieve_data_from_file(df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
     table = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
+    #   HOWEVER, FOR NOW, A DEFAULT TABLE (Examination) IS BEING USED
     if (df is not None) and (df.size > 0):
-        for index, row in df.iterrows():
-            print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-            database.save_data_object(table, row)
-        return True
+        df, err = preprocessData(df)
+        if err is None:
+            for index, row in df.iterrows():
+                try:
+                    print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
+                    database.save_data_object(row)
+                except Exception as e:
+                    print("ERROR IN SAVING OBJECT -> {}".format(e))
+            return True
+        else:
+            print("Error during preprocessing of the Data")
     else:
         print("Dataset is either empty or unavailable")
     return False

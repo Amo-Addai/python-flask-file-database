@@ -1,61 +1,43 @@
 import pandas as pd
-import hashlib
-
-from flask_pymongo import PyMongo
+import database, file_system
 
 
-mongo = None
-36
-def setup_db(app):
-    app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
-    mongo = PyMongo(app)
-    return app
+def setup_db_and_file_system(app):  # SETUP THE DATABASE AND FILE SYSTEM ENVIRONMENTS
+    app = database.setup_db(app)
+    return file_system.setup_file_system(app)
 
 
-def get_data(table):
-    data = mongo.db[table].find()
-    #   NOW, WORK WITH data HOWEVER YOU WANT
-    return data
-
-
-def hash_pin(pin):
-    h = hashlib.md5(pin.encode())
-    hash = h.hexdigest()
-    print("HASH -> {}".format(hash))
-    return hash
-
-
-def save_data_object(table, row):
-    obj = {}
-    for key in ['a']:
-        obj[key] = row[key] if key in row else ""
-    print("OBJECT -> {}".format(obj))  # NOW, YOU CAN SAVE THE DATA OBJECT
-    obj['pin'] = hash_pin(obj['pin'])
-    mongo.db[table].save(row)
+def retrieve_file_from_database_or_file_system(extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
+    data = database.get_data()  # PUT A table STRING AS A PARAM
+    pass
 
 
 def retrieve_data_from_file(df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
-    df = pd.DataFrame()
     table = "GET THE TABLE NAME NOWWW!!"
     if (df is not None) and (df.size > 0):
         for index, row in df.iterrows():
             print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-            save_data_object(table, row)
+            database.save_data_object(table, row)
     else:
         print("DATASET IS EMPTY")
         return True
     return False
 
 
-def handle_file(file, extra):
+def handle_file(filename, file, extra):
     df = None
-    if extra['type'] is "csv":
-        df = pd.read_csv(file)
-    elif extra['type'] is "xls":
-        df = pd.read_excel(file)
+    if 'file_type' in extra:
+        if extra['file_type'] is "csv":
+            df = pd.read_csv(file)
+        elif (extra['file_type'] is "xls") or (extra['file_type'] is "xlsx"):
+            df = pd.read_excel(file)
 
     if df is not None:
         if retrieve_data_from_file(df):
+            #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!
+            if ("save_to_file_system" in extra) and (extra["save_to_file_system"]):
+                print("Saving file to the file system too")
+                file_system.save_file(file, extra)
             return True
     print("COULDN'T RETRIEVE DATA FROM THE FILE")
     return False

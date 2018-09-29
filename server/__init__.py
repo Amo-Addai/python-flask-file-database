@@ -18,20 +18,20 @@ def retrieve_data_from_file(df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE 
         for index, row in df.iterrows():
             print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
             database.save_data_object(table, row)
-    else:
-        print("DATASET IS EMPTY")
         return True
+    else:
+        print("Dataset is either empty or unavailable")
     return False
 
 
-def handle_file(filename, file, extra):
+def handle_file(file, extra):
     df = None
     if 'file_type' in extra:
-        if extra['file_type'] is "csv":
+        type = extra['file_type']
+        if type is "csv":
             df = pd.read_csv(file)
-        elif (extra['file_type'] is "xls") or (extra['file_type'] is "xlsx"):
+        elif (type is "xls") or (type is "xlsx"):
             df = pd.read_excel(file)
-
     if df is not None:
         if retrieve_data_from_file(df):
             #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!

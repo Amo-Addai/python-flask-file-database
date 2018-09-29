@@ -16,14 +16,16 @@ def hello_world():
 
 
 def allowed_files(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    ext = filename.rsplit('.', 1)[1].lower()
+    return '.' in filename and ext in ALLOWED_EXTENSIONS, ext
 
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     if request.method == 'POST':  # and request.form:
-        body = request.form
+        extra = {
+            'body' : request.form
+        }
         print("BODY -> {}".format(body))
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -35,10 +37,12 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         if file.filename == '':
             print('No selected file')
             return redirect(request.url)
-        if file and allowed_files(file.filename):
+        file_is_allowed, extra["file_type"] = allowed_files(file.filename)
+        if file and file_is_allowed:
             filename = secure_filename(file.filename)
             print("Now handling file '{}'".format(filename))
-            if server.handle_file(filename, file, body):
+            extra["filename"] = filename
+            if server.handle_file(file, extra):
                 print("Server handled file '{}' successfully.".format(filename))
             else:
                 print("Server could not handle file '{}' successfully".format(filename))

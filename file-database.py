@@ -1,14 +1,16 @@
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
-import server
+from server import Server
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv', 'json',
                           'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
+server = Server()
 app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
+print()
 
 
 def allowed_files(filename):
@@ -25,7 +27,7 @@ def hello_world():
 def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     if request.method == 'POST':  # and request.form:
         extra = {
-            'body' : request.form
+            'body': request.form
         }
         # check if the post request has the file part
         if 'file' not in request.files:

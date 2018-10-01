@@ -17,15 +17,45 @@ class Server:
         return self.file_system.setup_file_system(app)
 
     def retrieve_file_from_database_or_file_system(self, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
-        data = self.database.get_data()  # PUT A table STRING AS A PARAM
-        pass
+        def processFile(df, extra=None):
+            if (extra is not None) and ("file_type" in extra):
+                type, file = extra["file_type"], None
+                if type == "csv":
+                    file = df.to_csv()
+                elif (type == "xls") or (type == "xlsx"):
+                    file = df.to_excel()
+                elif type == "json":
+                    file = df.to_json()
+                #
+                if file is not None:
+                    print("RETURNING THE {} FILE".format(type))
+                    return file
+            return None
+
+        try:
+            print("PARAMS FOR RETRIEVING FILE -> {}".format(extra))
+            df = None
+            if ("source" in extra):
+                if (extra["source"] == "db"):
+                    data = self.database.get_data()  # PUT A table STRING AS A PARAM
+                    df = pd.DataFrame(data)
+                elif (extra["source"] == "fs"):
+                    pass
+            if df is not None:
+                print("DATAFRAME IS READY ({} items)".format(df.size()))
+                print(df.head())
+                # NOW, PROCESS THIS data INTO A DATAFRAME, THEN INTO ANY FILETYPE (eg. xlsx, etd)
+                return processFile(df, extra)
+        except Exception as e:
+            print("ERROR IN RETRIEVING FILE -> {}".format(e))
+        return False
 
     def preprocessData(self, df):  # DO SOME DATA PREPROCESSING, CLEANING, etc
         # FILL NAN VALUES; MAKE ALL DATETIME OBJECTS STRINGS OR STH;
         df = df.fillna("")
         return df, None
 
-    def retrieve_data_from_file(self, df):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
+    def retrieve_data_from_file(self, df, extra):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
         table = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
         #   HOWEVER, FOR NOW, A DEFAULT TABLE (Examination) IS BEING USED
         if (df is not None) and (df.size > 0):
@@ -34,11 +64,12 @@ class Server:
                 for index, row in df.iterrows():
                     try:
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-                        # BUT 1ST, MAKE SURE THIS IS A JSON OBJECT, AND NOT A PANDAS SERIES OBJECT
-                        obj = json.loads(json.dumps(str(row.to_dict())))
-                        self.database.save_data_object(obj)
+                        self.database.save_data_object(row.to_dict())
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))
+                # NOW, JUST TEST HOW TO RETRIEVE DATA BACK FROM THE DATABASE
+                extra["source"] = "db"
+                self.retrieve_file_from_database_or_file_system(extra)
                 return True
             else:
                 print("Error during preprocessing of the Data")
@@ -57,7 +88,7 @@ class Server:
                     df = pd.read_excel(file)
             if df is not None:
                 print(df.head())
-                if self.retrieve_data_from_file(df):
+                if self.retrieve_data_from_file(df, extra):
                     #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!
                     if ("save_to_file_system" in extra) and (extra["save_to_file_system"]):
                         print("Saving file to the file system too")

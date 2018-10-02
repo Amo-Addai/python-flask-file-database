@@ -64,7 +64,8 @@ class Database:
             print(o)
             o = self.serialize_to("dict", o)
             data.append(o)
-        print("DONE DECRYTING ALL DATA")
+        print()
+        print("DONE RETRIEVING AND DECRYPTING ALL DATA")
         print("{} item(s) -> {}".format(len(data), data))
         return data
 
@@ -92,6 +93,7 @@ class Database:
                 obj['pin'] = self.encryption.decrypt(obj['pin'])
             for key in obj:
                 pass
+                # FIND A WAY TO CONVERT "TIME STRING" BACK TO A datetime.time OBJECT
                 # if type(obj[key]) is datetime.time:
                 #     obj[key] = obj[key].strftime("%H:%M:%S")
         else:

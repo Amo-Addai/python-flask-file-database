@@ -43,7 +43,7 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         if file and file_is_allowed:
             filename = secure_filename(file.filename)
             print("Now handling file '{}'".format(filename))
-            extra["filename"] = filename
+            extra["filename"], extra["table"] = filename, "Examination"  # FIND A WAY TO ASSIGN THE TABLE GENERICALLY
             if server.handle_file(file, extra):
                 print("Server handled file '{}' successfully.".format(filename))
             else:

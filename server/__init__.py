@@ -3,6 +3,8 @@ import json
 from database import Database
 from file_system import FileSystem
 
+DOWNLOAD_FOLDER = "/downloads/"
+
 
 class Server:
     database, file_system = None, None
@@ -18,21 +20,28 @@ class Server:
 
     def retrieve_file_from_database_or_file_system(self, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):
-            if (extra is not None) and ("file_type" in extra):
+            print()
+            print("NOW PROCESSING FILE -> {}".format(extra))
+            if (extra is not None) and ("file_type" in extra) and ("filename" in extra):
                 type, file = extra["file_type"], None
-                if type == "csv":
-                    file = df.to_csv()
-                elif (type == "xls") or (type == "xlsx"):
-                    file = df.to_excel()
-                elif type == "json":
-                    file = df.to_json()
-                #
+                if (len(extra["filename"]) > 0)(type in extra["filename"]):
+                    filepath = "{}{}".format(DOWNLOAD_FOLDER, extra["filename"])
+                    if type == "csv":
+                        df.to_csv(filepath, sep=',')
+                    elif type == "tsv":
+                        df.to_csv(filepath, sep='\t')
+                    elif (type == "xls") or (type == "xlsx"):
+                        table = extra["table"] if (("table" in extra) and (len(extra["table"]) > 0)) else "Sheet1"
+                        df.to_excel(filepath, sheet_name=table)
+                    elif type == "json":
+                        df.to_json(filepath)
                 if file is not None:
                     print("RETURNING THE {} FILE".format(type))
                     return file
             return None
 
         try:
+            print()
             print("PARAMS FOR RETRIEVING FILE -> {}".format(extra))
             df = None
             if ("source" in extra):
@@ -40,12 +49,16 @@ class Server:
                     data = self.database.get_data()  # PUT A table STRING AS A PARAM
                     df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
-                    pass
+                    if "filename" in extra:
+                        filename = extra["filename"]
+
             if df is not None:
-                print("DATAFRAME IS READY ({} items)".format(df.size()))
+                print("DATAFRAME IS READY ({} items)".format(len(df)))
                 print(df.head())
                 # NOW, PROCESS THIS data INTO A DATAFRAME, THEN INTO ANY FILETYPE (eg. xlsx, etd)
                 return processFile(df, extra)
+            else:
+                print("DATAFRAME COULD NOT BE RETRIEVED SUCCESSFULLY")
         except Exception as e:
             print("ERROR IN RETRIEVING FILE -> {}".format(e))
         return False
@@ -58,7 +71,7 @@ class Server:
     def retrieve_data_from_file(self, df, extra):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
         table = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
         #   HOWEVER, FOR NOW, A DEFAULT TABLE (Examination) IS BEING USED
-        if (df is not None) and (df.size > 0):
+        if (df is not None) and (len(df) > 0):
             df, err = self.preprocessData(df)
             if err is None:
                 for index, row in df.iterrows():
@@ -84,6 +97,8 @@ class Server:
                 type = extra['file_type']
                 if type == "csv":
                     df = pd.read_csv(file)
+                elif type == "tsv":
+                    df.read_csv(file, sep='\t')
                 elif (type == "xls") or (type == "xlsx"):
                     df = pd.read_excel(file)
             if df is not None:

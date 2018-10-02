@@ -1,9 +1,12 @@
 import pandas as pd
-import json
+import json, os
 from database import Database
 from file_system import FileSystem
 
-DOWNLOAD_FOLDER = "/downloads/"
+# os.path.join(current_directory, "/server/downloads/") OR os.getcwd()
+current_directory = os.path.dirname(os.path.realpath(__file__))
+DOWNLOAD_FOLDER = current_directory + "/downloads/"
+print(DOWNLOAD_FOLDER)  # 'C:\Users\kwadw\Desktop\file-database\server/server/downloads/
 
 
 class Server:
@@ -18,14 +21,15 @@ class Server:
         app = self.database.setup_db(app)
         return self.file_system.setup_file_system(app)
 
-    def retrieve_file_from_database_or_file_system(self, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
+    def retrieve_file_from_database_or_file_system(self, filter, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):
             print()
             print("NOW PROCESSING FILE -> {}".format(extra))
             if (extra is not None) and ("file_type" in extra) and ("filename" in extra):
                 type, file = extra["file_type"], None
-                if (len(extra["filename"]) > 0)(type in extra["filename"]):
-                    filepath = "{}{}".format(DOWNLOAD_FOLDER, extra["filename"])
+                if (len(extra["filename"]) > 0) and (type in extra["filename"]):
+                    filepath = r'{}{}'.format(DOWNLOAD_FOLDER, extra["filename"])
+                    print("PATH '{}'".format(filepath))
                     if type == "csv":
                         df.to_csv(filepath, sep=',')
                     elif type == "tsv":
@@ -36,7 +40,7 @@ class Server:
                     elif type == "json":
                         df.to_json(filepath)
                 if file is not None:
-                    print("RETURNING THE {} FILE".format(type))
+                    print("RETURNING THE .{} FILE -> {}".format(type, file))
                     return file
             return None
 
@@ -46,7 +50,7 @@ class Server:
             df = None
             if ("source" in extra):
                 if (extra["source"] == "db"):
-                    data = self.database.get_data()  # PUT A table STRING AS A PARAM
+                    data = self.database.get_data(filter)  # PUT A table STRING AS A PARAM
                     df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
                     if "filename" in extra:
@@ -63,16 +67,17 @@ class Server:
             print("ERROR IN RETRIEVING FILE -> {}".format(e))
         return False
 
-    def preprocessData(self, df):  # DO SOME DATA PREPROCESSING, CLEANING, etc
-        # FILL NAN VALUES; MAKE ALL DATETIME OBJECTS STRINGS OR STH;
-        df = df.fillna("")
-        return df, None
-
     def retrieve_data_from_file(self, df, extra):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
-        table = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
+        def preprocessData(df):  # DO SOME DATA PREPROCESSING, CLEANING, etc
+            if "table" not in extra:
+                extra["table"] = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
+            # FILL NAN VALUES; MAKE ALL DATETIME OBJECTS STRINGS OR STH;
+            df = df.fillna("")
+            return df, None
+
         #   HOWEVER, FOR NOW, A DEFAULT TABLE (Examination) IS BEING USED
         if (df is not None) and (len(df) > 0):
-            df, err = self.preprocessData(df)
+            df, err = preprocessData(df)
             if err is None:
                 for index, row in df.iterrows():
                     try:
@@ -80,9 +85,6 @@ class Server:
                         self.database.save_data_object(row.to_dict())
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))
-                # NOW, JUST TEST HOW TO RETRIEVE DATA BACK FROM THE DATABASE
-                extra["source"] = "db"
-                self.retrieve_file_from_database_or_file_system(extra)
                 return True
             else:
                 print("Error during preprocessing of the Data")
@@ -112,4 +114,18 @@ class Server:
         except Exception as e:
             print("SOME ERROR OCCURRED (handle_file()) -> {}".format(e))
         print("COULDN'T RETRIEVE DATA FROM THE FILE")
+        return False
+
+    def request_file(self, filter, extra):
+        def preprocessFilter(filter):
+            if "source" not in extra:
+                extra["source"] = "db"
+            return filter
+
+        try:
+            filter = preprocessFilter(filter)
+            return self.retrieve_file_from_database_or_file_system(filter, extra)
+        except Exception as e:
+            print("SOME ERROR OCCURRED (request_file()) -> {}".format(e))
+        print("COULDN'T RETRIEVE FILE FROM THE FILE-DATABASE")
         return False

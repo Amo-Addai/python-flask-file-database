@@ -11,6 +11,7 @@ server = Server()
 app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
 print()
+import os
 
 
 def allowed_files(filename):
@@ -21,6 +22,28 @@ def allowed_files(filename):
 @app.route('/')
 def hello_world():
     return 'Hello World!'
+
+
+@app.route('/request', methods=['GET', 'POST'])
+def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
+    if request.method == 'POST':  # and request.form:
+        extra = {
+            'body': request.form
+        }  # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
+        extra["table"] = "Examination" if ("table" not in extra["body"]) else extra["body"]["table"]
+        extra["body"]["filter"] = "all" if ("filter" not in extra["body"]) else extra["body"]["filter"]
+        extra["filename"] = "default" if ("filename" not in extra["body"]) else extra["body"]["filename"]
+        extra["file_type"] = "default" if ("file_type" not in extra["body"]) else extra["body"]["file_type"]
+        filename, filter = secure_filename(extra["filename"]), extra["body"]["filter"]
+        print("Now requesting file '{}'".format(filename))
+        if server.request_file(filter, extra):
+            print("Server handled file-request '{}' successfully.".format(filename))
+        else:
+            print("Server could not handle file-request '{}' successfully".format(filename))
+        return redirect(request.url)
+    return '''
+    PUT THE HTML CODE RIGHT HERE ...
+    '''
 
 
 @app.route('/upload', methods=['GET', 'POST'])

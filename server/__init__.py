@@ -118,6 +118,8 @@ class Server:
 
     def request_file(self, filter, extra):
         def preprocessFilter(filter):
+            if filter is not "all":
+                pass  # NOW, YOU CAN DO YOUR FILTER PREPROCESSING (eg. VALIDATION, etc) RIGHT HERE ..
             if "source" not in extra:
                 extra["source"] = "db"
             return filter
@@ -128,4 +130,4 @@ class Server:
         except Exception as e:
             print("SOME ERROR OCCURRED (request_file()) -> {}".format(e))
         print("COULDN'T RETRIEVE FILE FROM THE FILE-DATABASE")
-        return False
+        return None

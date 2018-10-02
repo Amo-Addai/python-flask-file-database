@@ -30,14 +30,17 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra = {
             'body': request.form
         }  # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
-        extra["table"] = "Examination" if ("table" not in extra["body"]) else extra["body"]["table"]
         extra["body"]["filter"] = "all" if ("filter" not in extra["body"]) else extra["body"]["filter"]
+        extra["table"] = "Examination" if ("table" not in extra["body"]) else extra["body"]["table"]
         extra["filename"] = "default" if ("filename" not in extra["body"]) else extra["body"]["filename"]
         extra["file_type"] = "default" if ("file_type" not in extra["body"]) else extra["body"]["file_type"]
         filename, filter = secure_filename(extra["filename"]), extra["body"]["filter"]
         print("Now requesting file '{}'".format(filename))
-        if server.request_file(filter, extra):
-            print("Server handled file-request '{}' successfully.".format(filename))
+        print("With parameters -> {}".format(extra))
+        file = server.request_file(filter, extra)
+        if file is not None:
+            print("Server handled file-request '{}' successfully -> {}".format(filename, file))
+            # FIND A WAY TO PUT THE file WITHIN THE CLIENT'S UI, FOR USER TO DOWNLOAD IT
         else:
             print("Server could not handle file-request '{}' successfully".format(filename))
         return redirect(request.url)

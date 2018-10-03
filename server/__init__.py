@@ -50,7 +50,7 @@ class Server:
             df = None
             if ("source" in extra):
                 if (extra["source"] == "db"):
-                    data = self.database.get_data(filter)  # PUT A table STRING AS A PARAM
+                    data = self.database.get_data(filter, table=extra["table"])  # PUT A table STRING AS A PARAM
                     df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
                     if "filename" in extra:
@@ -69,8 +69,6 @@ class Server:
 
     def retrieve_data_from_file(self, df, extra):  # RETRIEVE THE DATA FROM df & SAVE WITHIN THE DB
         def preprocessData(df):  # DO SOME DATA PREPROCESSING, CLEANING, etc
-            if "table" not in extra:
-                extra["table"] = "GET THE TABLE NAME NOWWW!!"  # MAKE SURE YOU FIND TABLE NAMES FOR THE DATABASE
             # FILL NAN VALUES; MAKE ALL DATETIME OBJECTS STRINGS OR STH;
             df = df.fillna("")
             return df, None
@@ -82,7 +80,7 @@ class Server:
                 for index, row in df.iterrows():
                     try:
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-                        self.database.save_data_object(row.to_dict())
+                        self.database.save_data_object(row.to_dict(), table=extra["table"])
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))
                 return True
@@ -111,6 +109,8 @@ class Server:
                         print("Saving file to the file system too")
                         self.file_system.save_file(file, extra)
                     return True
+                else: # YOU CAN ALSO SAVE THE FILE WITHIN THE FILE-SYSTEM, IN CASE DATA CANNOT BE RETRIEVED ..
+                    pass
         except Exception as e:
             print("SOME ERROR OCCURRED (handle_file()) -> {}".format(e))
         print("COULDN'T RETRIEVE DATA FROM THE FILE")

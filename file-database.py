@@ -11,7 +11,7 @@ server = Server()
 app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
 print()
-import os
+default_filter, default_table, default_filename, default_file_type = "all", "Examination", "default", "default"
 
 
 def allowed_files(filename):
@@ -29,11 +29,11 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     if request.method == 'POST':  # and request.form:
         extra = {
             'body': request.form
-        }  # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
-        extra["body"]["filter"] = "all" if ("filter" not in extra["body"]) else extra["body"]["filter"]
-        extra["table"] = "Examination" if ("table" not in extra["body"]) else extra["body"]["table"]
-        extra["filename"] = "default" if ("filename" not in extra["body"]) else extra["body"]["filename"]
-        extra["file_type"] = "default" if ("file_type" not in extra["body"]) else extra["body"]["file_type"]
+        } # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
+        extra["body"]["filter"] = default_filter if (("filter" not in extra["body"]) or (len(extra["body"]["filter"]) <= 0)) else extra["body"]["filter"]
+        extra["table"] = default_table if (("table" not in extra["body"]) or (len(extra["body"]["table"]) <= 0)) else extra["body"]["table"]
+        extra["filename"] = default_filename if (("filename" not in extra["body"]) or (len(extra["body"]["filename"]) <= 0)) else extra["body"]["filename"]
+        extra["file_type"] = default_file_type if (("file_type" not in extra["body"]) or (len(extra["body"]["file_type"]) <= 0)) else extra["body"]["file_type"]
         filename, filter = secure_filename(extra["filename"]), extra["body"]["filter"]
         print("Now requesting file '{}'".format(filename))
         print("With parameters -> {}".format(extra))
@@ -54,7 +54,8 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     if request.method == 'POST':  # and request.form:
         extra = {
             'body': request.form
-        }
+        } # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
+        extra["table"] = default_table if (("table" not in extra["body"]) or (len(extra["body"]["table"]) <= 0)) else extra["body"]["table"]
         # check if the post request has the file part
         if 'file' not in request.files:
             print('No file part')
@@ -69,7 +70,7 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         if file and file_is_allowed:
             filename = secure_filename(file.filename)
             print("Now handling file '{}'".format(filename))
-            extra["filename"], extra["table"] = filename, "Examination"  # FIND A WAY TO ASSIGN THE TABLE GENERICALLY
+            extra["filename"] = filename # FIND A WAY TO ASSIGN THE TABLE GENERICALLY
             if server.handle_file(file, extra):
                 print("Server handled file '{}' successfully.".format(filename))
             else:
@@ -81,6 +82,7 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     <h1>Upload new File</h1>
     <form method=post enctype=multipart/form-data>
       <input type=file name=file>
+      <input type=text name=table placeholder="Table Name" />
       <input type=submit value=Upload>
     </form>
     '''

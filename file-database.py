@@ -30,7 +30,7 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra = {
             'body': request.form
         } # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
-        extra["body"]["filter"] = default_filter if (("filter" not in extra["body"]) or (len(extra["body"]["filter"]) <= 0)) else extra["body"]["filter"]
+        extra["filter"] = default_filter if (("filter" not in extra["body"]) or (len(extra["body"]["filter"]) <= 0)) else extra["body"]["filter"]
         extra["table"] = default_table if (("table" not in extra["body"]) or (len(extra["body"]["table"]) <= 0)) else extra["body"]["table"]
         extra["filename"] = default_filename if (("filename" not in extra["body"]) or (len(extra["body"]["filename"]) <= 0)) else extra["body"]["filename"]
         extra["file_type"] = default_file_type if (("file_type" not in extra["body"]) or (len(extra["body"]["file_type"]) <= 0)) else extra["body"]["file_type"]
@@ -45,7 +45,25 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
             print("Server could not handle file-request '{}' successfully".format(filename))
         return redirect(request.url)
     return '''
-    PUT THE HTML CODE RIGHT HERE ...
+    <!doctype html>
+    <html>
+    <head>
+    <title>Request File</title>
+    </head>
+    <body>
+    <h1>Request File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=text name=table placeholder="Table Name" />
+      <input type=text name=filename placeholder="Download File Name" />
+      <select name=file_type placeholder="Download File Type">
+      {% for opt in ALLOWED_EXTENSIONS %}
+        <option value="{{opt}}">{{opt}}</option>
+      {% endfor %}
+      </input>
+      <input type=submit value=Download>
+    </form>
+    </body>
+    </html>
     '''
 
 
@@ -78,13 +96,19 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         return redirect(request.url)
     return '''
     <!doctype html>
+    <html>
+    <head>
     <title>Upload new File</title>
+    </head>
+    <body>
     <h1>Upload new File</h1>
     <form method=post enctype=multipart/form-data>
       <input type=file name=file>
       <input type=text name=table placeholder="Table Name" />
       <input type=submit value=Upload>
     </form>
+    </body>
+    </html>
     '''
 
 

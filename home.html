@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Management System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<h1>File Management System</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="panel-title pull-left">Dashboard</div>
+                    <div class="btn-group" style="float: right;">
+                        <!--  -->
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a id="chosenCategory" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                                   role="button" aria-expanded="false">
+                                    {# PUT CHOSEN CATEGORY HERE #}
+                                    Choose Category <span class="caret"></span>
+                                </a>
+                                <ul id="categoriesList" class="dropdown-menu" role="menu">
+                                    {# SPECIFY ALL AVALABLE CATEGORIES #}
+                                    <li><a href="#">Item I</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Other</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <br/>
+                {#  PUT FORM FOR UPLOADING FILES HERE  #}
+                <div id="formDiv">
+                    <form id="uploaddownloadForm" class="form-inline" action="#" method="POST"
+                          enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="table">Collection Name</label>
+                            <input type="text" class="form-control" id="table"
+                                   name="table" placeholder="Name of Collection">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="file">Select File</label>
+                            <input type="file" class="form-control" id="file" name="file">
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="uploaddownloadFormSubmit btn btn-default">Upload</button>
+                        </div>
+                    </form>
+                </div>
+                <br/>
+                {#     DISPLAY ALL FILES HERE, ACCORDING TO CATEGORIES     #}
+                <div class="panel-body">
+                    <div id="tableDiv" class="table-responsive">
+                        <table id="filesTable" class="table table-striped table-bordered table-hover">
+                            <tr id="tableHeader">
+                                <td>Collection</td>
+                                <td>File Name</td>
+                                <td>Action</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="download" tabindex="-1" role="dialog" aria-labelledby="download" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title custom_align" id="Heading">Download File</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input id="downloadtable" class="form-control " name="table" type="text"
+                           placeholder="Collection Name">
+                </div>
+                <div class="form-group">
+                    <input id="downloadfilename" class="form-control " name="filename" type="text"
+                           placeholder="Download File Name">
+                </div>
+                <div class="form-group">
+                    <label for="file_type">Download File Type</label>
+                    <select id="downloadfile_type" name="file_type" placeholder="Download File Type">
+                        {% for opt in ALLOWED_EXTENSIONS %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer ">
+                <button type="button" class="uploaddownloadFormSubmit btn btn-warning btn-lg" data-dismiss="modal"
+                        aria-hidden="true" style="width: 100%;"><span class="glyphicon glyphicon-ok-sign"></span>
+                    Download
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+<div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="download" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title custom_align" id="Heading">Delete this entry</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="alert alert-warning"><span class="glyphicon glyphicon-warning-sign"></span> Are you sure you
+                    want to delete this?
+                </div>
+
+            </div>
+            <div class="modal-footer ">
+                <button id="yesdelete" type="button" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Yes
+                </button>
+                <button id="nodelete" type="button" class="btn btn-warning" data-dismiss="modal" aria-hidden="true">
+                    <span class="glyphicon glyphicon-remove"></span> No
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!--  -->
+
+
+{#       UPLOAD DOWNLOAD FORM         #}
+{#     id (table <- name; file <- email;  )               #}
+
+{#                    <form method=post enctype=multipart/form-data>#}
+{#                      <input type=file name=file>#}
+{#                      <input type=text name=table placeholder="Table Name" />#}
+{#                      <input type=submit value=Upload>#}
+{#                    </form>#}
+{#                #}
+
+{#        upload <- add; download <- edit            #}
+{#                    <form method=post enctype=multipart/form-data>#}
+{#                        <input type=text name=table placeholder="Table Name"/>#}
+{#                        <input type=text name=filename placeholder="Download File Name"/>#}
+{#                        <select name=file_type placeholder="Download File Type">#}
+{#                            {% for opt in ALLOWED_EXTENSIONS %}#}
+{#                                <option value="{{ opt }}">{{ opt }}</option>#}
+{#                            {% endfor %}#}
+{#                        </select>#}
+{#                        <input type=submit value=Download>#}
+{#                    </form>#}
+{#                #}
+
+<script type="text/javascript">
+    console.log("HOME PAGE...");
+    const URL = "http://localhost:3000/", API = "http://localhost:3000/api/"
+    window.localStorage.setItem("web", URL);
+    window.localStorage.setItem("api", API);//api/
+    let dbs = ['PUBLIC', 'DVLA', 'GHIE', 'SSNITT', 'NEC', 'NHIS', 'GOVERNMENT', 'INTERNATIONAL'];
+    let categories = [];
+    window.localStorage.setItem("databases", JSON.stringify(dbs));
+    window.localStorage.setItem("categories", JSON.stringify(categories));
+    window.localStorage.setItem("chosenCategory", dbs[0]);
+    window.localStorage.setItem("data", []);
+    window.localStorage.setItem("downloadMode", false);
+    window.localStorage.setItem("downloadId", "");
+    window.localStorage.setItem("deleteId", "");
+
+    window.onload = function () { //   <span class="caret"></span>
+        $("#chosenCategory").html(window.localStorage.getItem("chosenCategory") + '   <span class="caret"></span>');
+        $("#categoriesList").html("");
+        // FIRST POPOULATE THE DATABASE LIST ITEMS
+        var dbs = JSON.parse(window.localStorage.getItem("databases"));
+        for (let db of dbs) {
+            $("#categoriesList").append('<li><a id="' + db + '" href="#">' + db + '</a></li>');
+        }
+        $("#categoriesList").click(function (e) {
+            // e.target is our targetted element so e.target.nodeName is "A"
+            if (e.target && e.target.nodeName == "A") {
+                var x = e.target.id;
+                window.localStorage.setItem("chosenCategory", x);
+                $("#chosenCategory").html(x + '   <span class="caret"></span>');
+                console.log(x + " was clicked");
+                getData();
+            }
+        });
+
+        async function getRow(e, thisObj) {
+            return new Promise((resolve, reject) => {
+                var row = null;
+                if (e.target === thisObj && e.target.nodeName === "BUTTON") row = e.target.parentNode.parentNode;
+                else if (e.target.nodeName === "SPAN") row = e.target.parentNode.parentNode.parentNode;
+                else {
+                    alert("Sorry, some error occured");
+                }
+                resolve(row);
+            });
+        }
+
+        async function findPerson(id) {
+            return new Promise((resolve, reject) => {
+                var data = JSON.parse(window.localStorage.getItem("data"));
+                for (var obj of data) {
+                    if (obj.id == id) resolve(obj);
+                }
+                resolve(null);
+            });
+        }
+
+        $("#yesdelete").click(function (e) { //
+            // e.preventDefault();
+            // e.stopPropagation();
+            id = window.localStorage.getItem("deleteId");
+            console.log("ID !!!! -> " + id);
+
+            var url = window.localStorage.getItem('api') + "persons",
+                meth = "DELETE", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
+                query = ""; // "database=" + window.localStorage.getItem("chosenCategory");
+            if ((id !== null) && (id.length > 0)) url += "/" + id;
+            else {
+                console.log("NO ITEM SELECTED TO BE DELETED")
+                return;
+            }
+            var data = {
+                database: window.localStorage.getItem("chosenCategory")
+            }
+            console.log("URL -> " + url + "?" + query);
+            console.log("METHOD -> " + meth);
+            console.log("DATA -> " + JSON.stringify(data));
+
+            $.ajax({
+                url: url, type: meth, dataType: "json", data: data,
+                success: function (data) {
+                    console.log("DATA DELETED -> " + JSON.stringify(data));
+                    console.log("RELOADING DATA ...");
+                    getData();
+                }, error: function (err) {
+                    alert("Sorry, some error occured");
+                },
+                complete: function () { // THIS ISN'T REALLY NECESSARY, BUT WHATEVER ...
+                    window.localStorage.setItem("downloadMode", false);
+                    window.localStorage.setItem("downloadId", "");
+                    window.localStorage.setItem("deleteId", "");
+                    $("#name").val("");
+                    $("#email").val("");
+                    $("#downloadtable").val("");
+                    $("#downloadfilename").val("");
+                }
+            });
+        });
+
+        $("#nodelete").click(function (e) { // YOU CHOOSE NOT TO DO ANY SHIT HERE IF YOU DON'T WANT TO ...
+            // THIS ISN'T REALLY NECESSARY, BUT WHATEVER ...
+            window.localStorage.setItem("downloadMode", false);
+            window.localStorage.setItem("downloadId", "");
+            window.localStorage.setItem("deleteId", "");
+            $("#name").val("");
+            $("#email").val("");
+            $("#downloadtable").val("");
+            $("#downloadfilename").val("");
+        });
+
+        function setupOnListItemClick() {
+            $(".downloadButton").click(async function (e) { //
+                    var row = await getRow(e, this);
+                    console.log("ROW NODE -> " + row.nodeName + " : ID -> " + row.id);
+                    if (row != null && row != undefined) {
+                        var id = row.id || "";
+                        var obj = await
+                            findPerson(id);
+                        console.log("OBJ -> " + JSON.stringify(obj));
+                        if (obj) { // NOW, SET THE FORM INPUTS TO THE DATA OF LIST ITEM CLICKED ON ...
+                            window.localStorage.setItem("downloadMode", true);
+                            window.localStorage.setItem("downloadId", obj.id || "");
+                            $("#downloadtable").val(obj.name || "");
+                            $("#downloadfilename").val(obj.email || "");
+                        } else alert("Sorry, some error occured");
+                    } else alert("Sorry, some error occured");
+                }
+            );
+
+            $(".deleteButton").click(async function (e) { //
+                    var row = await
+                        getRow(e, this);
+                    console.log("ROW NODE -> " + row.nodeName + " : ID -> " + row.id);
+                    if (row != null && row != undefined) {
+                        var id = row.id || "";
+                        var obj = await
+                            findPerson(id);
+                        console.log("OBJ -> " + JSON.stringify(obj));
+                        if (obj) { // SHOW A DELETE ("ARE YOU SURE?") DIALOG BOX, BEFORE DELETING
+                            window.localStorage.setItem("deleteId", id);
+                        } else alert("Sorry, some error occured");
+                    } else alert("Sorry, some error occured");
+                }
+            );
+
+        }
+
+        setupOnListItemClick(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT
+
+        $('.uploaddownloadFormSubmit').click(function (e) {
+            e.preventDefault();
+            console.log("PREVENTING RELOADING OF THIS PAGE, BUT STILL CALLING FORM'S 'onSubmit'");
+            $('#uploaddownloadForm').submit();
+        });
+
+        $("#uploaddownloadForm").submit(function (e) {
+            e.preventDefault();
+            // VALIDATION
+            if (( $("#name").val().length <= 0 ) ||
+                ( $("#email").val().length <= 0 )) {
+                var download = window.localStorage.getItem("downloadMode");
+                if (download == 'true') {
+                    if (( $("#downloadtable").val().length <= 0 ) ||
+                        ( $("#downloadfilename").val().length <= 0 )) {
+                        alert("Please fill form");
+                        return;
+                    }
+                } else {
+                    alert("Please fill form");
+                    return;
+                }
+            }
+            console.log("Name -> " + $("#name").val() + " : Email -> " + $("#email").val());
+            var url = window.localStorage.getItem('api') + "persons",
+                meth = "PUT", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
+                query = ""; // "database=" + window.localStorage.getItem("chosenCategory");
+            var download = window.localStorage.getItem("downloadMode"), id = window.localStorage.getItem("downloadId");
+
+            if ((download == 'true') && (id !== null) && (id.length > 0)) url += "/" + window.localStorage.getItem("downloadId");
+            else meth = "POST";
+
+            var data = {
+                database: window.localStorage.getItem("chosenCategory")
+            };
+            if (download == 'true') {
+                data['person'] = {
+                    name: $("#downloadtable").val(), email: $("#downloadfilename").val()
+                }
+            } else {
+                data['person'] = {
+                    name: $("#name").val(), email: $("#email").val()
+                }
+            }
+
+            console.log("URL -> " + url + "?" + query);
+            console.log("METHOD -> " + meth);
+            console.log("DATA -> " + JSON.stringify(data));
+
+            $.ajax({
+                url: url, type: meth, dataType: "json", data: data,
+                success: function (data) {
+                    console.log("DATA UPLOADED/DOWNLOADED -> " + JSON.stringify(data));
+                    console.log("RELOADING DATA ...");
+                    getData();
+                }, error: function (err) {
+                    alert("Sorry, some error occured");
+                },
+                complete: function () {
+                    window.localStorage.setItem("downloadMode", false);
+                    window.localStorage.setItem("downloadId", "");
+                    window.localStorage.setItem("deleteId", "");
+                    $("#name").val("");
+                    $("#email").val("");
+                    $("#downloadtable").val("");
+                    $("#downloadfilename").val("");
+                }
+            });
+        });
+
+        function getData() {
+            var url = window.localStorage.getItem('api') + "persons",
+                query = "database=" + window.localStorage.getItem("chosenCategory");
+            console.log("URL -> " + url + "?" + query);
+
+            //  FIND OUT HOW TO HANDLE ERRORS RETURNED WITHIN THIS REQUEST (IN CASE OF INCORRECT DATABASE SPECIFIED)
+            $.getJSON(url, query, function (data) {
+                console.log("RESULTS ...");
+                console.log(data);
+                window.localStorage.setItem("data", JSON.stringify(data));
+                //<tr id="tableHeader"><td>Collection Name</td><td>File Name</td></tr>
+                var table = $("#filesTable");
+                table.find("tr:not(:first)").remove();
+                for (var obj of data) {
+                    table.append('<tr id="' + obj.id + '"><td>' + obj.name + '</td><td>' + obj.email + '</td>' +
+                        // table.append('<tr id="' + obj.id + '"><td>' + obj.table + '</td><td>' + obj.filename + '</td>' +
+                        '<td>' +
+                        // /*
+                        '<button class="downloadButton btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">' +
+                        '<span class="glyphicon glyphicon-pencil"></span>' +
+                        '</button>' +
+                        '<button class="deleteButton btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">' +
+                        '<span class="glyphicon glyphicon-trash"></span>' +
+                        '</button>' +
+                        // */
+                        '</td>' +
+                        '</tr>');
+                    /*
+                     <td>
+                     <!-- <p><button class="btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-pencil"></span></button></p>
+                     <p><button class="btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-trash"></span></button></p> -->
+
+                     <button class="btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-pencil"></span></button>
+                     <button class="btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-trash"></span></button>
+                     </td>
+                     */
+                }
+                setupOnListItemClick();
+            });
+        }
+
+        getData(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT
+
+    };
+</script>
+
+{##}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+</body>
+</html>

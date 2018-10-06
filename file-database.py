@@ -3,8 +3,8 @@ from werkzeug.utils import secure_filename
 
 from server import Server
 
-ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv', 'json',
-                          'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv', 'json', 'xml', 'txt', 'pdf'])
+CATEGORIES = set([])
 
 app = Flask(__name__)
 server = Server()
@@ -20,8 +20,8 @@ def allowed_files(filename):
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def home():
+    return render_template('hello.html')
 
 
 @app.route('/request', methods=['GET', 'POST'])
@@ -44,27 +44,7 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         else:
             print("Server could not handle file-request '{}' successfully".format(filename))
         return redirect(request.url)
-    return '''
-    <!doctype html>
-    <html>
-    <head>
-    <title>Request File</title>
-    </head>
-    <body>
-    <h1>Request File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=text name=table placeholder="Table Name" />
-      <input type=text name=filename placeholder="Download File Name" />
-      <select name=file_type placeholder="Download File Type">
-      {% for opt in ALLOWED_EXTENSIONS %}
-        <option value="{{opt}}">{{opt}}</option>
-      {% endfor %}
-      </input>
-      <input type=submit value=Download>
-    </form>
-    </body>
-    </html>
-    '''
+    return render_template('hello.html')
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -94,22 +74,7 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
             else:
                 print("Server could not handle file '{}' successfully".format(filename))
         return redirect(request.url)
-    return '''
-    <!doctype html>
-    <html>
-    <head>
-    <title>Upload new File</title>
-    </head>
-    <body>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=text name=table placeholder="Table Name" />
-      <input type=submit value=Upload>
-    </form>
-    </body>
-    </html>
-    '''
+    return render_template('hello.html')
 
 
 if __name__ == '__main__':

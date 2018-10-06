@@ -11,7 +11,7 @@ server = Server()
 app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
 print()
-default_filter, default_table, default_filename, default_file_type = "all", "Examination", "default", "default"
+default_filter, default_collection, default_filename, default_file_type = "all", "Examination", "default", "default"
 
 
 def allowed_files(filename):
@@ -31,7 +31,7 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
             'body': request.form
         } # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
         extra["filter"] = default_filter if (("filter" not in extra["body"]) or (len(extra["body"]["filter"]) <= 0)) else extra["body"]["filter"]
-        extra["table"] = default_table if (("table" not in extra["body"]) or (len(extra["body"]["table"]) <= 0)) else extra["body"]["table"]
+        extra["collection"] = default_collection if (("collection" not in extra["body"]) or (len(extra["body"]["collection"]) <= 0)) else extra["body"]["collection"]
         extra["filename"] = default_filename if (("filename" not in extra["body"]) or (len(extra["body"]["filename"]) <= 0)) else extra["body"]["filename"]
         extra["file_type"] = default_file_type if (("file_type" not in extra["body"]) or (len(extra["body"]["file_type"]) <= 0)) else extra["body"]["file_type"]
         filename, filter = secure_filename(extra["filename"]), extra["body"]["filter"]
@@ -53,7 +53,7 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra = {
             'body': request.form
         } # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
-        extra["table"] = default_table if (("table" not in extra["body"]) or (len(extra["body"]["table"]) <= 0)) else extra["body"]["table"]
+        extra["collection"] = default_collection if (("collection" not in extra["body"]) or (len(extra["body"]["collection"]) <= 0)) else extra["body"]["collection"]
         # check if the post request has the file part
         if 'file' not in request.files:
             print('No file part')
@@ -68,7 +68,7 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         if file and file_is_allowed:
             filename = secure_filename(file.filename)
             print("Now handling file '{}'".format(filename))
-            extra["filename"] = filename # FIND A WAY TO ASSIGN THE TABLE GENERICALLY
+            extra["filename"] = filename # FIND A WAY TO ASSIGN THE COLLECTION GENERICALLY
             if server.handle_file(file, extra):
                 print("Server handled file '{}' successfully.".format(filename))
             else:

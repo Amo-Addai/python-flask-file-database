@@ -42,9 +42,9 @@
                     <form id="uploaddownloadForm" class="form-inline" action="#" method="POST"
                           enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="table">Collection Name</label>
-                            <input type="text" class="form-control" id="table"
-                                   name="table" placeholder="Name of Collection">
+                            <label for="collection">Collection Name</label>
+                            <input type="text" class="form-control" id="collection"
+                                   name="collection" placeholder="Name of Collection">
                         </div>
 
                         <div class="form-group">
@@ -75,7 +75,6 @@
     </div>
 </div>
 
-
 <div class="modal fade" id="download" tabindex="-1" role="dialog" aria-labelledby="download" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -85,7 +84,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <input id="downloadtable" class="form-control " name="table" type="text"
+                    <input id="downloadcollection" class="form-control " name="collection" type="text"
                            placeholder="Collection Name">
                 </div>
                 <div class="form-group">
@@ -93,8 +92,8 @@
                            placeholder="Download File Name">
                 </div>
                 <div class="form-group">
-                    <label for="file_type">Download File Type</label>
-                    <select id="downloadfile_type" name="file_type" placeholder="Download File Type">
+                    <label for="downloadfile_type">Download File Type</label>
+                    <select id="downloadfile_type" name="file_type">
                         {% for opt in ALLOWED_EXTENSIONS %}
                             <option value="{{ opt }}">{{ opt }}</option>
                         {% endfor %}
@@ -112,7 +111,6 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
-
 
 <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="download" aria-hidden="true">
     <div class="modal-dialog">
@@ -141,42 +139,43 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
-<!--  -->
 
 
 {#       UPLOAD DOWNLOAD FORM         #}
-{#     id (table <- name; file <- email;  )               #}
-
-{#                    <form method=post enctype=multipart/form-data>#}
-{#                      <input type=file name=file>#}
-{#                      <input type=text name=table placeholder="Table Name" />#}
-{#                      <input type=submit value=Upload>#}
-{#                    </form>#}
+{#     id (collection <- name; file <- email;  )               #}
+{#
+                    <form method=post enctype=multipart/form-data>
+                      <input type=file name=file>
+                      <input type=text name=collection placeholder="Collection Name" />
+                      <input type=submit value=Upload>
+                    </form>
+#}
 {#                #}
 
 {#        upload <- add; download <- edit            #}
-{#                    <form method=post enctype=multipart/form-data>#}
-{#                        <input type=text name=table placeholder="Table Name"/>#}
-{#                        <input type=text name=filename placeholder="Download File Name"/>#}
-{#                        <select name=file_type placeholder="Download File Type">#}
-{#                            {% for opt in ALLOWED_EXTENSIONS %}#}
-{#                                <option value="{{ opt }}">{{ opt }}</option>#}
-{#                            {% endfor %}#}
-{#                        </select>#}
-{#                        <input type=submit value=Download>#}
-{#                    </form>#}
+{#
+                    <form method=post enctype=multipart/form-data>
+                        <input type=text name=collection placeholder="Collection Name"/>
+                        <input type=text name=filename placeholder="Download File Name"/>
+                        <select name=file_type placeholder="Download File Type">
+                            {% for opt in ALLOWED_EXTENSIONS %}
+                                <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type=submit value=Download>
+                    </form>
+#}
 {#                #}
+
 
 <script type="text/javascript">
     console.log("HOME PAGE...");
     const URL = "http://localhost:3000/", API = "http://localhost:3000/api/"
     window.localStorage.setItem("web", URL);
-    window.localStorage.setItem("api", API);//api/
-    let dbs = ['PUBLIC', 'DVLA', 'GHIE', 'SSNITT', 'NEC', 'NHIS', 'GOVERNMENT', 'INTERNATIONAL'];
-    let categories = [];
-    window.localStorage.setItem("databases", JSON.stringify(dbs));
+    window.localStorage.setItem("api", API);
+    let categories = ['Examinations Category'];
     window.localStorage.setItem("categories", JSON.stringify(categories));
-    window.localStorage.setItem("chosenCategory", dbs[0]);
+    window.localStorage.setItem("chosenCategory", categories[0]);
     window.localStorage.setItem("data", []);
     window.localStorage.setItem("downloadMode", false);
     window.localStorage.setItem("downloadId", "");
@@ -186,9 +185,9 @@
         $("#chosenCategory").html(window.localStorage.getItem("chosenCategory") + '   <span class="caret"></span>');
         $("#categoriesList").html("");
         // FIRST POPOULATE THE DATABASE LIST ITEMS
-        var dbs = JSON.parse(window.localStorage.getItem("databases"));
-        for (let db of dbs) {
-            $("#categoriesList").append('<li><a id="' + db + '" href="#">' + db + '</a></li>');
+        var categories = JSON.parse(window.localStorage.getItem("categories"));
+        for (let cat of categories) {
+            $("#categoriesList").append('<li><a id="' + cat + '" href="#">' + cat + '</a></li>');
         }
         $("#categoriesList").click(function (e) {
             // e.target is our targetted element so e.target.nodeName is "A"
@@ -213,7 +212,7 @@
             });
         }
 
-        async function findPerson(id) {
+        async function findCollection(id) {
             return new Promise((resolve, reject) => {
                 var data = JSON.parse(window.localStorage.getItem("data"));
                 for (var obj of data) {
@@ -229,7 +228,7 @@
             id = window.localStorage.getItem("deleteId");
             console.log("ID !!!! -> " + id);
 
-            var url = window.localStorage.getItem('api') + "persons",
+            var url = window.localStorage.getItem('api') + "collections",
                 meth = "DELETE", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
                 query = ""; // "database=" + window.localStorage.getItem("chosenCategory");
             if ((id !== null) && (id.length > 0)) url += "/" + id;
@@ -283,7 +282,7 @@
                     if (row != null && row != undefined) {
                         var id = row.id || "";
                         var obj = await
-                            findPerson(id);
+                            findCollection(id);
                         console.log("OBJ -> " + JSON.stringify(obj));
                         if (obj) { // NOW, SET THE FORM INPUTS TO THE DATA OF LIST ITEM CLICKED ON ...
                             window.localStorage.setItem("downloadMode", true);
@@ -302,7 +301,7 @@
                     if (row != null && row != undefined) {
                         var id = row.id || "";
                         var obj = await
-                            findPerson(id);
+                            findCollection(id);
                         console.log("OBJ -> " + JSON.stringify(obj));
                         if (obj) { // SHOW A DELETE ("ARE YOU SURE?") DIALOG BOX, BEFORE DELETING
                             window.localStorage.setItem("deleteId", id);
@@ -339,7 +338,7 @@
                 }
             }
             console.log("Name -> " + $("#name").val() + " : Email -> " + $("#email").val());
-            var url = window.localStorage.getItem('api') + "persons",
+            var url = window.localStorage.getItem('api') + "collections",
                 meth = "PUT", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
                 query = ""; // "database=" + window.localStorage.getItem("chosenCategory");
             var download = window.localStorage.getItem("downloadMode"), id = window.localStorage.getItem("downloadId");
@@ -351,11 +350,11 @@
                 database: window.localStorage.getItem("chosenCategory")
             };
             if (download == 'true') {
-                data['person'] = {
+                data['collection'] = {
                     name: $("#downloadtable").val(), email: $("#downloadfilename").val()
                 }
             } else {
-                data['person'] = {
+                data['collection'] = {
                     name: $("#name").val(), email: $("#email").val()
                 }
             }
@@ -386,7 +385,7 @@
         });
 
         function getData() {
-            var url = window.localStorage.getItem('api') + "persons",
+            var url = window.localStorage.getItem('api') + "collections",
                 query = "database=" + window.localStorage.getItem("chosenCategory");
             console.log("URL -> " + url + "?" + query);
 

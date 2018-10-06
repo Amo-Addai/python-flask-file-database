@@ -35,8 +35,8 @@ class Server:
                     elif type == "tsv":
                         df.to_csv(filepath, sep='\t')
                     elif (type == "xls") or (type == "xlsx"):
-                        table = extra["table"] if (("table" in extra) and (len(extra["table"]) > 0)) else "Sheet1"
-                        df.to_excel(filepath, sheet_name=table)
+                        collection = extra["collection"] if (("collection" in extra) and (len(extra["collection"]) > 0)) else "Sheet1"
+                        df.to_excel(filepath, sheet_name=collection)
                     elif type == "json":
                         df.to_json(filepath)
                 if file is not None:
@@ -50,7 +50,7 @@ class Server:
             df = None
             if ("source" in extra):
                 if (extra["source"] == "db"):
-                    data = self.database.get_data(filter, table=extra["table"])  # PUT A table STRING AS A PARAM
+                    data = self.database.get_data(filter, collection=extra["collection"])  # PUT A COLLECTION STRING AS A PARAM
                     df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
                     if "filename" in extra:
@@ -73,14 +73,14 @@ class Server:
             df = df.fillna("")
             return df, None
 
-        #   HOWEVER, FOR NOW, A DEFAULT TABLE (Examination) IS BEING USED
+        #   HOWEVER, FOR NOW, A DEFAULT COLLECTION (Examination) IS BEING USED
         if (df is not None) and (len(df) > 0):
             df, err = preprocessData(df)
             if err is None:
                 for index, row in df.iterrows():
                     try:
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-                        self.database.save_data_object(row.to_dict(), table=extra["table"])
+                        self.database.save_data_object(row.to_dict(), collection=extra["collection"])
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))
                 return True

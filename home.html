@@ -167,12 +167,12 @@
 #}
 {#                #}
 
-
 <script type="text/javascript">
     console.log("HOME PAGE...");
     const URL = "http://localhost:3000/", API = "http://localhost:3000/api/"
     window.localStorage.setItem("web", URL);
     window.localStorage.setItem("api", API);
+    // YOU CAN HARDCODE CATEGORIES HERE, OR GENERICALLY GET IT FROM THE SERVER
     let categories = ['Examinations Category'];
     window.localStorage.setItem("categories", JSON.stringify(categories));
     window.localStorage.setItem("chosenCategory", categories[0]);
@@ -215,7 +215,8 @@
         async function findCollection(id) {
             return new Promise((resolve, reject) => {
                 var data = JSON.parse(window.localStorage.getItem("data"));
-                for (var obj of data) {
+                for (var obj of data) { // OR USE .collection
+                    // if (obj.collection == id) resolve(obj);
                     if (obj.id == id) resolve(obj);
                 }
                 resolve(null);
@@ -256,9 +257,9 @@
                     window.localStorage.setItem("downloadMode", false);
                     window.localStorage.setItem("downloadId", "");
                     window.localStorage.setItem("deleteId", "");
-                    $("#name").val("");
-                    $("#email").val("");
-                    $("#downloadtable").val("");
+                    $("#collection").val("");
+                    $("#filename").val("");
+                    $("#downloadcollection").val("");
                     $("#downloadfilename").val("");
                 }
             });
@@ -269,9 +270,9 @@
             window.localStorage.setItem("downloadMode", false);
             window.localStorage.setItem("downloadId", "");
             window.localStorage.setItem("deleteId", "");
-            $("#name").val("");
-            $("#email").val("");
-            $("#downloadtable").val("");
+            $("#collection").val("");
+            $("#filename").val("");
+            $("#downloadcollection").val("");
             $("#downloadfilename").val("");
         });
 
@@ -287,8 +288,8 @@
                         if (obj) { // NOW, SET THE FORM INPUTS TO THE DATA OF LIST ITEM CLICKED ON ...
                             window.localStorage.setItem("downloadMode", true);
                             window.localStorage.setItem("downloadId", obj.id || "");
-                            $("#downloadtable").val(obj.name || "");
-                            $("#downloadfilename").val(obj.email || "");
+                            $("#downloadcollection").val(obj.collection || "");
+                            $("#downloadfilename").val(obj.filename || "");
                         } else alert("Sorry, some error occured");
                     } else alert("Sorry, some error occured");
                 }
@@ -323,11 +324,11 @@
         $("#uploaddownloadForm").submit(function (e) {
             e.preventDefault();
             // VALIDATION
-            if (( $("#name").val().length <= 0 ) ||
-                ( $("#email").val().length <= 0 )) {
+            if (( $("#collection").val().length <= 0 ) ||
+                ( $("#filename").val().length <= 0 )) {
                 var download = window.localStorage.getItem("downloadMode");
                 if (download == 'true') {
-                    if (( $("#downloadtable").val().length <= 0 ) ||
+                    if (( $("#downloadcollection").val().length <= 0 ) ||
                         ( $("#downloadfilename").val().length <= 0 )) {
                         alert("Please fill form");
                         return;
@@ -337,7 +338,7 @@
                     return;
                 }
             }
-            console.log("Name -> " + $("#name").val() + " : Email -> " + $("#email").val());
+            console.log("Collection Name -> " + $("#collection").val() + " : File Name -> " + $("#filename").val());
             var url = window.localStorage.getItem('api') + "collections",
                 meth = "PUT", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
                 query = ""; // "database=" + window.localStorage.getItem("chosenCategory");
@@ -351,11 +352,11 @@
             };
             if (download == 'true') {
                 data['collection'] = {
-                    name: $("#downloadtable").val(), email: $("#downloadfilename").val()
+                    collection: $("#downloadcollection").val(), filename: $("#downloadfilename").val()
                 }
             } else {
                 data['collection'] = {
-                    name: $("#name").val(), email: $("#email").val()
+                    collection: $("#collection").val(), filename: $("#filename").val()
                 }
             }
 
@@ -376,9 +377,9 @@
                     window.localStorage.setItem("downloadMode", false);
                     window.localStorage.setItem("downloadId", "");
                     window.localStorage.setItem("deleteId", "");
-                    $("#name").val("");
-                    $("#email").val("");
-                    $("#downloadtable").val("");
+                    $("#collection").val("");
+                    $("#filename").val("");
+                    $("#downloadcollection").val("");
                     $("#downloadfilename").val("");
                 }
             });
@@ -397,9 +398,8 @@
                 //<tr id="tableHeader"><td>Collection Name</td><td>File Name</td></tr>
                 var table = $("#filesTable");
                 table.find("tr:not(:first)").remove();
-                for (var obj of data) {
-                    table.append('<tr id="' + obj.id + '"><td>' + obj.name + '</td><td>' + obj.email + '</td>' +
-                        // table.append('<tr id="' + obj.id + '"><td>' + obj.table + '</td><td>' + obj.filename + '</td>' +
+                for (var obj of data) { // MAKE SURE THAT THE obj HAS .id PROPERTY AVAILABLE
+                    table.append('<tr id="' + obj.id + '"><td>' + obj.collection + '</td><td>' + obj.filename + '</td>' +
                         '<td>' +
                         // /*
                         '<button class="downloadButton btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">' +

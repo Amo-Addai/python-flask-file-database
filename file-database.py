@@ -1,4 +1,4 @@
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 
 from server import Server
@@ -21,7 +21,7 @@ def allowed_files(filename):
 
 @app.route('/')
 def home():
-    return render_template('hello.html')
+    return render_template('home.html', ALLOWED_EXTENSIONS=ALLOWED_EXTENSIONS)
 
 
 @app.route('/request', methods=['GET', 'POST'])

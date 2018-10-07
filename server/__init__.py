@@ -23,7 +23,7 @@ class Server:
         return app
 
     def get_collections(self, query):
-        category = "all"
+        category = "All"
         if ("category" in query) and (len(query["category"]) > 0):
             category = query["category"]
         data = self.database.get_collections(category)
@@ -62,8 +62,7 @@ class Server:
             df = None
             if ("source" in extra):
                 if (extra["source"] == "db"):
-                    data = self.database.get_data(filter,
-                                                  collection=extra["collection"])  # PUT A COLLECTION STRING AS A PARAM
+                    data = self.database.get_data(filter, extra)  # PUT A COLLECTION STRING AS A PARAM
                     if data is not None:
                         df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
@@ -94,7 +93,7 @@ class Server:
                 for index, row in df.iterrows():
                     try:
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-                        success = self.database.save_data_object(row.to_dict(), collection=extra["collection"])
+                        success = self.database.save_data_object(row.to_dict(), extra)
                         # WORK WITH success HOWEVER YOU WANT ..
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))

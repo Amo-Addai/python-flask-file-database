@@ -11,7 +11,7 @@ server = Server()
 app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
 print()
-default_filter, default_collection, default_filename, default_file_type = "all", "Examination", "default", "default"
+default_filter, default_category, default_collection, default_filename, default_file_type = "all", "All", "Examination", "", ""
 
 
 def allowed_files(filename):
@@ -30,7 +30,7 @@ def home():
 
 @app.route('/collections', methods=['GET'])
 def get_collections_data():
-    query = request.args if (request.args is not None) else {"category": "all"}
+    query = request.args if (request.args is not None) else {"category": "All"}
     if ("category" not in query) or (len(query["category"]) <= 0):
         query["category"] = "all"
     print("QUERY -> {}".format(query))
@@ -48,6 +48,9 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra["collection"] = default_collection if (
             ("collection" not in extra["body"]) or (len(extra["body"]["collection"]) <= 0)) else extra["body"][
             "collection"]
+        extra["category"] = default_category if (
+            ("category" not in extra["body"]) or (len(extra["body"]["category"]) <= 0)) else extra["body"][
+            "category"]
         extra["filename"] = default_filename if (
             ("filename" not in extra["body"]) or (len(extra["body"]["filename"]) <= 0)) else extra["body"]["filename"]
         extra["file_type"] = default_file_type if (
@@ -75,6 +78,9 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra["collection"] = default_collection if (
             ("collection" not in extra["body"]) or (len(extra["body"]["collection"]) <= 0)) else extra["body"][
             "collection"]
+        extra["category"] = default_category if (
+            ("category" not in extra["body"]) or (len(extra["body"]["category"]) <= 0)) else extra["body"][
+            "category"]
         # check if the post request has the file part
         if 'file' not in request.files:
             print('No file part')

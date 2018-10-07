@@ -19,7 +19,18 @@ class Server:
         self.database = Database()
         self.file_system = FileSystem()
         app = self.database.setup_db(app)
-        return self.file_system.setup_file_system(app)
+        app = self.file_system.setup_file_system(app)
+        return app
+
+    def get_collections(self, query):
+        category = "all"
+        if ("category" in query) and (len(query["category"]) > 0):
+            category = query["category"]
+        data = self.database.get_collections(category)
+        json_data = json.dumps(json.loads(data))
+        print("DATA -> {}".format(data))
+        print("JSON DATA -> {}".format(json_data))
+        return json_data
 
     def retrieve_file_from_database_or_file_system(self, filter, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):
@@ -35,7 +46,8 @@ class Server:
                     elif type == "tsv":
                         df.to_csv(filepath, sep='\t')
                     elif (type == "xls") or (type == "xlsx"):
-                        collection = extra["collection"] if (("collection" in extra) and (len(extra["collection"]) > 0)) else "Sheet1"
+                        collection = extra["collection"] if (
+                            ("collection" in extra) and (len(extra["collection"]) > 0)) else "Sheet1"
                         df.to_excel(filepath, sheet_name=collection)
                     elif type == "json":
                         df.to_json(filepath)
@@ -50,8 +62,10 @@ class Server:
             df = None
             if ("source" in extra):
                 if (extra["source"] == "db"):
-                    data = self.database.get_data(filter, collection=extra["collection"])  # PUT A COLLECTION STRING AS A PARAM
-                    df = pd.DataFrame(data)
+                    data = self.database.get_data(filter,
+                                                  collection=extra["collection"])  # PUT A COLLECTION STRING AS A PARAM
+                    if data is not None:
+                        df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
                     if "filename" in extra:
                         filename = extra["filename"]
@@ -80,7 +94,8 @@ class Server:
                 for index, row in df.iterrows():
                     try:
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-                        self.database.save_data_object(row.to_dict(), collection=extra["collection"])
+                        success = self.database.save_data_object(row.to_dict(), collection=extra["collection"])
+                        # WORK WITH success HOWEVER YOU WANT ..
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))
                 return True
@@ -109,7 +124,7 @@ class Server:
                         print("Saving file to the file system too")
                         self.file_system.save_file(file, extra)
                     return True
-                else: # YOU CAN ALSO SAVE THE FILE WITHIN THE FILE-SYSTEM, IN CASE DATA CANNOT BE RETRIEVED ..
+                else:  # YOU CAN ALSO SAVE THE FILE WITHIN THE FILE-SYSTEM, IN CASE DATA CANNOT BE RETRIEVED ..
                     pass
         except Exception as e:
             print("SOME ERROR OCCURRED (handle_file()) -> {}".format(e))

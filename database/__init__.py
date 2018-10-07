@@ -30,7 +30,7 @@ class Database:
         for collection in DATABASE["collections"]:
             print("Creating Database Collection '{}' -> {}".format(collection, self.db[collection]))
             print("Now, Clearing Database Collection '{}' -> {} item(s)".format(self.db[collection].remove(),
-                                                                           self.db[collection].find().count()))
+                                                                                self.db[collection].find().count()))
             self.test_db(collection)
         return app
 
@@ -54,28 +54,43 @@ class Database:
         print("DONE DECRYTING ALL DATA")
         print("{} item(s) -> {}".format(len(data), data))
         print("Done testing, Clearing Database Collection '{}' again -> {} item(s)".format(self.db[collection].remove(),
-                                                                                      self.db[collection].find().count()))
+                                                                                           self.db[
+                                                                                               collection].find().count()))
         print()
+
+    def get_collections(self, category="all"):
+        print("GETTING COLLECTIONS WITHIN CATEGORY ''".format(category))
+        return []
+
+    def validate_collection(self, collection):
+        print("NOW, VALIDATING COLLECTION ''".format(collection))
+        # CHECK IF collection ALREADY EXISTS WITHIN THE DB, IF NOT, THEN ADD IT
+        return False
 
     def get_data(self, filter=None, collection=default_collection):
-        cursor, data = self.db[collection].find(filter if (filter is not None) else {}), []
-        for o in cursor:
+        if self.validate_collection(collection):
+            cursor, data = self.db[collection].find(filter if (filter is not None) else {}), []
+            for o in cursor:
+                print()
+                print(o)
+                o = self.serialize_to("dict", o)
+                data.append(o)
             print()
-            print(o)
-            o = self.serialize_to("dict", o)
-            data.append(o)
-        print()
-        print("DONE RETRIEVING AND DECRYPTING ALL DATA")
-        print("{} item(s) -> {}".format(len(data), data))
-        return data
+            print("DONE RETRIEVING AND DECRYPTING ALL DATA")
+            print("{} item(s) -> {}".format(len(data), data))
+            return data
+        return None
 
     def save_data_object(self, obj, collection=default_collection):
-        obj = self.serialize_to("mongodb", obj)
-        print("OBJECT {} -> {}".format(type(obj), obj))
-        # NOW, YOU CAN SAVE THE DATA OBJECT
-        self.db[collection].insert(obj, check_keys=False)
-        # COZ YOU'RE LETTING MONGO-DB ALLOW '.' & '$' WITHIN YOUR KEYS, IT MIGHT HAVE SOME ISSUES
-        # ISSUES WHEN YOU'RE USING A FILTER WITH .find({'key.prop':'value'}) TO ACCESS INNER DOCUMENTS
+        if self.validate_collection(collection):
+            obj = self.serialize_to("mongodb", obj)
+            print("OBJECT {} -> {}".format(type(obj), obj))
+            # NOW, YOU CAN SAVE THE DATA OBJECT
+            self.db[collection].insert(obj, check_keys=False)
+            # COZ YOU'RE LETTING MONGO-DB ALLOW '.' & '$' WITHIN YOUR KEYS, IT MIGHT HAVE SOME ISSUES
+            # ISSUES WHEN YOU'RE USING A FILTER WITH .find({'key.prop':'value'}) TO ACCESS INNER DOCUMENTS
+            return True
+        return False
 
     def serialize_to(self, param, obj):
         if param == "mongodb":  # 1ST, TRY TO DO SOME FURTHER PREPROCESSING (eg. CONVERT datetime.time OBJECTS INTO STRINGS)

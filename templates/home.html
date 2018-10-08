@@ -51,14 +51,13 @@
                             <input type="text" class="form-control" id="collection"
                                    name="collection" placeholder="Name of Collection">
                         </div>
-
                         <div class="form-group">
-                            <label for="file">Select File</label>
-                            <input type="file" class="form-control" id="file" name="file">
+                            <label for="filename">Select File</label>
+                            <input type="file" class="form-control" id="filename" name="file">
                         </div>
-
                         <div class="form-group">
                             <button type="submit" class="uploaddownloadFormSubmit btn btn-default">Upload</button>
+                            <span class="glyphicon glyphicon-upload"></span>
                         </div>
                     </form>
                 </div>
@@ -177,7 +176,7 @@
     window.localStorage.setItem("web", URL);
     window.localStorage.setItem("api", API);
     // YOU CAN HARDCODE CATEGORIES HERE, OR GENERICALLY GET IT FROM THE SERVER
-    let categories = ['Examinations Category'];
+    let categories = ['All'];
     window.localStorage.setItem("categories", JSON.stringify(categories));
     window.localStorage.setItem("chosenCategory", categories[0]);
     window.localStorage.setItem("data", []);
@@ -186,6 +185,12 @@
     window.localStorage.setItem("deleteId", "");
 
     window.onload = function () { // <span class="caret"></span>
+        function handleResponse(data){
+            console.log(JSON.stringify(data));
+            if (data.hasOwnProperty("data")) data = data["data"];
+            return data;
+        }
+
         $("#chosenCategory").html(window.localStorage.getItem("chosenCategory") + '   <span class="caret"></span>');
         $("#categoriesList").html("");
         // FIRST POPOULATE THE CATEGORY LIST ITEMS
@@ -207,7 +212,7 @@
         $("#yesdelete").click(function (e) { //
             // e.preventDefault();
             // e.stopPropagation();
-            id = window.localStorage.getItem("deleteId");
+            var id = window.localStorage.getItem("deleteId");
             console.log("ID !!!! -> " + id);
 
             var url = window.localStorage.getItem('api') + "collections",
@@ -239,9 +244,10 @@
                     window.localStorage.setItem("downloadId", "");
                     window.localStorage.setItem("deleteId", "");
                     $("#collection").val("");
-                    $("#filename").val("");
+                    $("#filename").val(""); // THIS ELEM IS AN <input type="file"/> SO WORK WITH IT WELL :)
                     $("#downloadcollection").val("");
                     $("#downloadfilename").val("");
+                    $("#downloadfile_type").val(""); // THIS ELEM IS A <select> <option> SO WORK WITH IT WELL :)
                 }
             });
         });
@@ -251,9 +257,10 @@
             window.localStorage.setItem("downloadId", "");
             window.localStorage.setItem("deleteId", "");
             $("#collection").val("");
-            $("#filename").val("");
+            $("#filename").val(""); // THIS ELEM IS AN <input type="file"/> SO WORK WITH IT WELL :)
             $("#downloadcollection").val("");
             $("#downloadfilename").val("");
+            $("#downloadfile_type").val("");  // THIS ELEM IS A <select> <option> SO WORK WITH IT WELL :)
         });
 
         async function getRow(e, thisObj) {
@@ -267,12 +274,13 @@
                 resolve(row);
             });
         }
+
         async function findCollection(id) {
             return new Promise((resolve, reject) => {
                 var data = JSON.parse(window.localStorage.getItem("data"));
                 for (var obj of data) { // OR USE .collection
                     // if (obj.collection == id) resolve(obj);
-                    if (obj.id == id) resolve(obj);
+                    if (obj._id == id) resolve(obj);
                 }
                 resolve(null);
             });
@@ -288,8 +296,9 @@
                         console.log("OBJ -> " + JSON.stringify(obj));
                         if (obj) { // NOW, SET THE FORM INPUTS TO THE DATA OF LIST ITEM CLICKED ON ...
                             window.localStorage.setItem("downloadMode", true);
-                            window.localStorage.setItem("downloadId", obj.id || "");
+                            window.localStorage.setItem("downloadId", obj._id || "");
                             $("#downloadcollection").val(obj.collection || "");
+                            // MAKE SURE YOU 1ST REMOVE THE EXTENSION .ext FROM obj.filename STRING :)
                             $("#downloadfilename").val(obj.filename || "");
                         } else alert("Sorry, some error occured");
                     } else alert("Sorry, some error occured");
@@ -310,14 +319,55 @@
                 }
             );
         }
-        setupOnListItemClick(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT
+
+        function getData() {
+            var url = window.localStorage.getItem('api') + "collections",
+                query = "category=" + window.localStorage.getItem("chosenCategory");
+            console.log("URL -> " + url + "?" + query);
+
+            //  FIND OUT HOW TO HANDLE ERRORS RETURNED WITHIN THIS REQUEST (IN CASE OF INCORRECT CATEGORY SPECIFIED)
+            $.getJSON(url, query, function (data) {
+                data = handleResponse(data);
+                window.localStorage.setItem("data", JSON.stringify(data));
+                //<tr id="tableHeader"><td>Collection Name</td><td>File Name</td></tr>
+                var table = $("#filesTable");
+                table.find("tr:not(:first)").remove();
+                for (var obj of data) { // MAKE SURE THAT THE obj HAS ._id PROPERTY AVAILABLE
+                    table.append('<tr id="' + obj._id + '"><td>' + obj.collection + '</td><td>' + obj.filename + '</td>' +
+                        '<td>' +
+                        // /*
+                        '<button class="downloadButton btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">' +
+                        '<span class="glyphicon glyphicon-download"></span>' +
+                        '</button>' +
+                        '<button class="deleteButton btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">' +
+                        '<span class="glyphicon glyphicon-trash"></span>' +
+                        '</button>' +
+                        // */
+                        '</td>' +
+                        '</tr>');
+                    /*
+                     <td>
+                     <!-- <p><button class="btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-download"></span></button></p>
+                     <p><button class="btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-trash"></span></button></p> -->
+
+                     <button class="btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-download"></span></button>
+                     <button class="btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">
+                     <span class="glyphicon glyphicon-trash"></span></button>
+                     </td>
+                     */
+                }
+                setupOnListItemClick();
+            });
+        }
 
         $('.uploaddownloadFormSubmit').click(function (e) {
             e.preventDefault();
             console.log("PREVENTING RELOADING OF THIS PAGE, BUT STILL CALLING FORM'S 'onSubmit'");
             $('#uploaddownloadForm').submit();
         });
-
         $("#uploaddownloadForm").submit(function (e) {
             e.preventDefault();
             // VALIDATION
@@ -346,29 +396,45 @@
 
             var data = {
                 category: window.localStorage.getItem("chosenCategory")
-            };
+            }, formData = null;
             if (download == 'true') {
+                url += "/download";
                 data['collection'] = {
                     collection: $("#downloadcollection").val(), filename: $("#downloadfilename").val()
                 }
             } else {
+                url += "/upload";
                 data['collection'] = {
-                    collection: $("#collection").val(), filename: $("#filename").val()
-                }
+                    collection: $("#collection").val(), filename: $("#filename").val(),
+                    {#                    file: $('#filename').attr('files')[0]  // THIS RETRIEVES THE FILE TO BE UPLOADED :)#}
+                };
+                console.log("DATA BEFORE FormData -> " + JSON.stringify(data));
+                formData = new FormData($('#uploaddownloadForm')[0]);
+                formData.append("category", window.localStorage.getItem("chosenCategory"));
+                {#                data = null; data = formData;#}
+                console.log("DATA AFTER FormData -> " + JSON.stringify(formData));
             }
 
             console.log("URL -> " + url + "?" + query);
             console.log("METHOD -> " + meth);
             console.log("DATA -> " + JSON.stringify(data));
 
+            // UPLOAD MODE WILL BE IN 'multipart/form-data'
+            // DOWNLOAD MODE WILL BE IN 'application/json', BUT RESULT IN A FILE
+
             $.ajax({
-                url: url, type: meth, dataType: "json", data: data,
+                url: url, type: meth, dataType: "json", enctype: "multipart/form-data", data: data,
+                {#                processData: false,#}
+                {#                contentType: false,#}
+                {#                cache: false,#}
+                {#                timeout: 600000,#}
                 success: function (data) {
                     console.log("DATA UPLOADED/DOWNLOADED -> " + JSON.stringify(data));
                     console.log("RELOADING DATA ...");
                     getData();
                 }, error: function (err) {
                     alert("Sorry, some error occured");
+                    console.log("ERROR -> " + err);
                 },
                 complete: function () {
                     window.localStorage.setItem("downloadMode", false);
@@ -382,49 +448,7 @@
             });
         });
 
-        function getData() {
-            var url = window.localStorage.getItem('api') + "collections",
-                query = "category=" + window.localStorage.getItem("chosenCategory");
-            console.log("URL -> " + url + "?" + query);
-
-            //  FIND OUT HOW TO HANDLE ERRORS RETURNED WITHIN THIS REQUEST (IN CASE OF INCORRECT CATEGORY SPECIFIED)
-            $.getJSON(url, query, function (data) {
-                console.log("RESULTS ...");
-                console.log(data);
-                window.localStorage.setItem("data", JSON.stringify(data));
-                //<tr id="tableHeader"><td>Collection Name</td><td>File Name</td></tr>
-                var table = $("#filesTable");
-                table.find("tr:not(:first)").remove();
-                for (var obj of data) { // MAKE SURE THAT THE obj HAS .id PROPERTY AVAILABLE
-                    table.append('<tr id="' + obj.id + '"><td>' + obj.collection + '</td><td>' + obj.filename + '</td>' +
-                        '<td>' +
-                        // /*
-                        '<button class="downloadButton btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">' +
-                        '<span class="glyphicon glyphicon-pencil"></span>' +
-                        '</button>' +
-                        '<button class="deleteButton btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">' +
-                        '<span class="glyphicon glyphicon-trash"></span>' +
-                        '</button>' +
-                        // */
-                        '</td>' +
-                        '</tr>');
-                    /*
-                     <td>
-                     <!-- <p><button class="btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">
-                     <span class="glyphicon glyphicon-pencil"></span></button></p>
-                     <p><button class="btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">
-                     <span class="glyphicon glyphicon-trash"></span></button></p> -->
-
-                     <button class="btn btn-primary btn-sm pull-left" data-title="Download" data-toggle="modal" data-target="#download" data-placement="top" rel="tooltip">
-                     <span class="glyphicon glyphicon-pencil"></span></button>
-                     <button class="btn btn-danger btn-sm pull-right" data-title="Delete" data-toggle="modal" data-target="#delete" data-placement="top" rel="tooltip">
-                     <span class="glyphicon glyphicon-trash"></span></button>
-                     </td>
-                     */
-                }
-                setupOnListItemClick();
-            });
-        }
+        setupOnListItemClick(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT
         getData(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT
     };
 </script>

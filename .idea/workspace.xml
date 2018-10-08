@@ -5,6 +5,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/database/__init__.py" afterPath="$PROJECT_DIR$/database/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/file-database.py" afterPath="$PROJECT_DIR$/file-database.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/__init__.py" afterPath="$PROJECT_DIR$/server/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/home.html" afterPath="$PROJECT_DIR$/templates/home.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,7 +15,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/file_database$file_database.coverage" NAME="file-database Coverage Results" MODIFIED="1538893415250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/file_database$file_database.coverage" NAME="file-database Coverage Results" MODIFIED="1539001955627" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
@@ -22,22 +23,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="home.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="home.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/templates/home.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2720">
-              <caret line="388" column="0" lean-forward="true" selection-start-line="388" selection-start-column="0" selection-end-line="388" selection-end-column="0" />
+            <state relative-caret-position="-444">
+              <caret line="189" column="44" lean-forward="false" selection-start-line="189" selection-start-column="44" selection-end-line="189" selection-end-column="44" />
               <folding>
                 <element signature="n#style#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#button#0;n#div#2;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="e#9089#9507#0#HTML" expanded="false" />
-                <element signature="e#9554#11388#0#HTML" expanded="false" />
-                <element signature="e#11433#11912#0#HTML" expanded="false" />
-                <element signature="e#11958#12416#0#HTML" expanded="false" />
-                <element signature="e#12459#12842#0#HTML" expanded="false" />
-                <element signature="e#12884#14692#0#HTML" expanded="false" />
-                <element signature="e#14831#15020#0#HTML" expanded="false" />
-                <element signature="e#15077#17960#0#HTML" expanded="false" />
+                <element signature="n#div#2;n#body#0;n#html#0;n#!!top" expanded="false" />
+                <element signature="e#9342#9760#0#HTML" expanded="false" />
+                <element signature="e#9807#11822#0#HTML" expanded="false" />
+                <element signature="e#11867#12516#0#HTML" expanded="false" />
+                <element signature="e#12562#13020#0#HTML" expanded="false" />
+                <element signature="e#13064#13448#0#HTML" expanded="false" />
+                <element signature="e#13490#15402#0#HTML" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -46,8 +46,8 @@
       <file leaf-file-name="file-database.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/file-database.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+            <state relative-caret-position="-52">
+              <caret line="77" column="0" lean-forward="true" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
               <folding>
                 <element signature="e#0#75#0" expanded="true" />
               </folding>
@@ -58,8 +58,8 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="185">
-              <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+            <state relative-caret-position="112">
+              <caret line="30" column="48" lean-forward="false" selection-start-line="30" selection-start-column="48" selection-end-line="30" selection-end-column="48" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -67,11 +67,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="71" column="19" lean-forward="false" selection-start-line="71" selection-start-column="19" selection-end-line="71" selection-end-column="19" />
+            <state relative-caret-position="34">
+              <caret line="68" column="54" lean-forward="false" selection-start-line="68" selection-start-column="54" selection-end-line="68" selection-end-column="54" />
               <folding />
             </state>
           </provider>
@@ -111,10 +111,10 @@
         <option value="$PROJECT_DIR$/home.html" />
         <option value="$PROJECT_DIR$/client/public/css/app.css" />
         <option value="$PROJECT_DIR$/client/public/js/app.js" />
-        <option value="$PROJECT_DIR$/templates/home.html" />
-        <option value="$PROJECT_DIR$/file-database.py" />
-        <option value="$PROJECT_DIR$/server/__init__.py" />
         <option value="$PROJECT_DIR$/database/__init__.py" />
+        <option value="$PROJECT_DIR$/templates/home.html" />
+        <option value="$PROJECT_DIR$/server/__init__.py" />
+        <option value="$PROJECT_DIR$/file-database.py" />
       </list>
     </option>
   </component>
@@ -426,7 +426,7 @@
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5282392" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.57937807" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6923077" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -538,50 +538,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/home.html">
+    <entry file="file://$PROJECT_DIR$/database/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2720">
-          <caret line="388" column="0" lean-forward="true" selection-start-line="388" selection-start-column="0" selection-end-line="388" selection-end-column="0" />
-          <folding>
-            <element signature="n#style#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#div#2;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="e#9089#9507#0#HTML" expanded="false" />
-            <element signature="e#9554#11388#0#HTML" expanded="false" />
-            <element signature="e#11433#11912#0#HTML" expanded="false" />
-            <element signature="e#11958#12416#0#HTML" expanded="false" />
-            <element signature="e#12459#12842#0#HTML" expanded="false" />
-            <element signature="e#12884#14692#0#HTML" expanded="false" />
-            <element signature="e#14831#15020#0#HTML" expanded="false" />
-            <element signature="e#15077#17960#0#HTML" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/file-database.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#75#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="34">
+          <caret line="68" column="54" lean-forward="false" selection-start-line="68" selection-start-column="54" selection-end-line="68" selection-end-column="54" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+        <state relative-caret-position="112">
+          <caret line="30" column="48" lean-forward="false" selection-start-line="30" selection-start-column="48" selection-end-line="30" selection-end-column="48" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/__init__.py">
+    <entry file="file://$PROJECT_DIR$/file-database.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="71" column="19" lean-forward="false" selection-start-line="71" selection-start-column="19" selection-end-line="71" selection-end-column="19" />
-          <folding />
+        <state relative-caret-position="-52">
+          <caret line="77" column="0" lean-forward="true" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#75#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/home.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-444">
+          <caret line="189" column="44" lean-forward="false" selection-start-line="189" selection-start-column="44" selection-end-line="189" selection-end-column="44" />
+          <folding>
+            <element signature="n#style#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#button#0;n#div#2;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#div#2;n#body#0;n#html#0;n#!!top" expanded="false" />
+            <element signature="e#9342#9760#0#HTML" expanded="false" />
+            <element signature="e#9807#11822#0#HTML" expanded="false" />
+            <element signature="e#11867#12516#0#HTML" expanded="false" />
+            <element signature="e#12562#13020#0#HTML" expanded="false" />
+            <element signature="e#13064#13448#0#HTML" expanded="false" />
+            <element signature="e#13490#15402#0#HTML" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

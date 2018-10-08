@@ -66,9 +66,13 @@ class Database:
                 print()
 
     def get_collections(self, category=default_category):
-        print("GETTING COLLECTIONS WITHIN CATEGORY ''".format(category))
-        data = self.db[COLLECTION].find({'categories':category})
-        print("COLLECTIONS -> {}".format(data))
+        print("GETTING COLLECTIONS WITHIN CATEGORY '{}'".format(category))
+        # data = self.db[COLLECTION].find()  # THESE 2 CAN BOTH WORK
+        # data = [x for x in data if (category in x["categories"])]
+        cursor, data = self.db[COLLECTION].find({'categories':category}), []
+        for o in cursor:
+            data.append(o)
+        print("{} COLLECTION(S) -> {}".format(len(data), data))
         return data
 
     def validate_collection(self, extra):

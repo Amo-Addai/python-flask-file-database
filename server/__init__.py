@@ -27,8 +27,8 @@ class Server:
         if ("category" in query) and (len(query["category"]) > 0):
             category = query["category"]
         data = self.database.get_collections(category)
-        json_data = json.dumps(json.loads(data))
         print("DATA -> {}".format(data))
+        json_data = json.loads(json.dumps(data))
         print("JSON DATA -> {}".format(json_data))
         return json_data
 

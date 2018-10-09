@@ -217,8 +217,13 @@
                             window.localStorage.setItem("downloadMode", true);
                             window.localStorage.setItem("downloadId", obj._id || "");
                             $("#downloadcollection").val(obj.collection || "");
-                            // MAKE SURE YOU 1ST REMOVE THE EXTENSION .ext FROM obj.filename STRING :)
-                            $("#downloadfilename").val(obj.filename || "");
+                            // MAKE SURE YOU 1ST REMOVE THE EXTENSION .ext FROM  STRING :)
+                            var x = obj.filename;
+                            var ext = x.substring(x.lastIndexOf('.')+1, x.length);
+                            var fname = x.replace("."+ext, ""); // GET VALUES FOR THESE, FROM obj.filename
+                            console.log(fname + " : " + ext);
+                            $("#downloadfilename").val(fname || "");
+                            $("#downloadfile_type").val(ext || "xlsx" || "");
                         } else alert("Sorry, some error occured");
                     } else alert("Sorry, some error occured");
                 }
@@ -310,7 +315,7 @@
                 query = ""; // "category=" + window.localStorage.getItem("chosenCategory");
             var download = window.localStorage.getItem("downloadMode"), id = window.localStorage.getItem("downloadId");
 
-            if ((download == 'true') && (id !== null) && (id.length > 0)) url += "/" + window.localStorage.getItem("downloadId");
+            if ((download == 'true') && (id !== null) && (id.length > 0)) url += ""; // "/" + window.localStorage.getItem("downloadId");
             else meth = "POST";
 
             var data = {
@@ -323,6 +328,7 @@
 
             if (download == 'true') {
                 url += "/download";
+                data["_id"] = window.localStorage.getItem("downloadId");
                 data['collection'] = $("#downloadcollection").val();
                 data['filename'] = $("#downloadfilename").val();
                 data['file_type'] = $("#downloadfile_type").val();  // FIND A WAY TO GET THIS

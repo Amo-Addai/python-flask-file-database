@@ -18,7 +18,7 @@ COLLECTION = "Collection"
 
 class Database:
     db, encryption = None, None
-    default_filter = "all"
+    default_filter = None
     default_collection = "New Collection"
     default_filename = "New File"
     default_category = "All"
@@ -140,12 +140,15 @@ class Database:
     def get_data(self, filter=None, extra=None):
         collection = self.validate_collection(extra)
         if collection is not None:
+            filter = None if (filter == "all") else filter  # DO THIS, IN CASE filter = "all"
             cursor, data = self.db[collection].find(filter if (filter is not None) else {}), []
+            i = 0
             for o in cursor:
-                print()
+                print(i)
                 print(o)
                 o = self.serialize_to("dict", o)
                 data.append(o)
+                i += 1
             print()
             print("DONE RETRIEVING AND DECRYPTING ALL DATA")
             print("{} item(s) -> {}".format(len(data), data))

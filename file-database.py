@@ -12,7 +12,7 @@ server = Server()
 app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
 print()
-default_filter, default_category, default_collection, default_filename, default_file_type = "all", "All", "Examination", "", ""
+default_filter, default_category, default_collection, default_filename, default_file_type = None, "All", "Examination", "", ""
 request_data, response_message, response_data = {}, "Sorry, some error occurred.", {}
 
 
@@ -135,11 +135,11 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     return return_response(False)
 
 
-@app.route('/api/collections/download', methods=['POST'])
+@app.route('/api/collections/download', methods=['PUT'])
 def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     global request_data, response_message, response_data
-    if request.method == 'POST':
-        request_data, extra = request.get_data(), {}
+    if request.method == 'PUT':
+        request_data, extra = request.json, {}
         print("REQUEST -> {}".format(request_data))
         extra["category"] = default_category if (
             ("category" not in request_data) or (len(request_data["category"]) <= 0)) else request_data[
@@ -152,20 +152,22 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra["file_type"] = default_file_type if (
             ("file_type" not in request_data) or (len(request_data["file_type"]) <= 0)) else request_data[
             "file_type"]
-        # extra["filter"] = default_filter if (
-        #     ("filter" not in request_data) or (len(request_data["filter"]) <= 0)) else request_data["filter"]
+        extra["filter"] = default_filter if (
+            ("filter" not in request_data) or (len(request_data["filter"]) <= 0)) else request_data["filter"]
         #
-        filename, filter = secure_filename(extra["filename"]), extra["body"]["filter"]
+        filename, filter = extra["filename"], extra["filter"]
         print("Now requesting file '{}'".format(filename))
         print("With parameters -> {}".format(extra))
-        file = server.request_file(filter, extra)
-        if file is not None:
-            print("Server handled file-request '{}' successfully -> {}".format(filename, file))
-            # FIND A WAY TO PUT THE file WITHIN THE CLIENT'S UI, FOR USER TO DOWNLOAD IT
-            response_message, response_data = "", {}
+        filepath = server.request_file(filter, extra)
+        if filepath is not None:
+            # uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
+            # return send_from_directory(directory=uploads, filename=filename)
+            response_message, response_data = "Server handled file-download request '{}' successfully".format(filename), {
+
+            }
             return return_response(True)
         else:
-            response_message = "Server could not handle file-request '{}' successfully".format(filename)
+            response_message = "Server could not handle file-download request '{}' successfully".format(filename)
         return return_response(False)
     return return_response(False)
 

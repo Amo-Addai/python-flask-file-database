@@ -6,7 +6,7 @@ from file_system import FileSystem
 # os.path.join(current_directory, "/server/downloads/") OR os.getcwd()
 current_directory = os.path.dirname(os.path.realpath(__file__))
 DOWNLOAD_FOLDER = current_directory + "/downloads/"
-print(DOWNLOAD_FOLDER)  # 'C:\Users\kwadw\Desktop\file-database\server/server/downloads/
+print(DOWNLOAD_FOLDER)  # 'C:\Users\kwadw\Desktop\file-database\server/downloads/
 
 
 class Server:
@@ -42,30 +42,33 @@ class Server:
 
     def retrieve_file_from_database_or_file_system(self, filter, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):
-            print()
-            print("NOW PROCESSING FILE -> {}".format(extra))
-            if (extra is not None) and ("file_type" in extra) and ("filename" in extra):
-                type, file = extra["file_type"], None
-                if (len(extra["filename"]) > 0) and (type in extra["filename"]):
-                    filepath = r'{}{}'.format(DOWNLOAD_FOLDER, extra["filename"])
-                    print("PATH '{}'".format(filepath))
-                    if type == "csv":
-                        df.to_csv(filepath, sep=',')
-                    elif type == "tsv":
-                        df.to_csv(filepath, sep='\t')
-                    elif (type == "xls") or (type == "xlsx"):
-                        collection = extra["collection"] if (
-                            ("collection" in extra) and (len(extra["collection"]) > 0)) else "Sheet1"
-                        df.to_excel(filepath, sheet_name=collection)
-                    elif type == "json":
-                        df.to_json(filepath)
-                if file is not None:
-                    print("RETURNING THE .{} FILE -> {}".format(type, file))
-                    return file
+            try:
+                print()
+                print("NOW PROCESSING FILE -> {}".format(extra))
+                if (extra is not None) and ("file_type" in extra) and ("filename" in extra):
+                    type, file, filepath = extra["file_type"], None, None
+                    if (len(extra["filename"]) > 0) and (len(type) > 0):
+                        filepath = r'{}{}.{}'.format(DOWNLOAD_FOLDER, extra["filename"], type)
+                        print("PATH -> '{}'".format(filepath))
+                        if type == "csv":
+                            df.to_csv(filepath, sep=',')
+                        elif type == "tsv":
+                            df.to_csv(filepath, sep='\t')
+                        elif (type == "xls") or (type == "xlsx"):
+                            engine = "xlsxwriter"  # "openpyxl"  # FIND OUT THE BEST ENGINE TO USE TO CREATE THE EXCEL FILE :)
+                            sheet_name = extra["collection"] if (
+                                ("collection" in extra) and (len(extra["collection"]) > 0)) else "Sheet1"
+                            print("EXCEL ENGINE '{}' & SHEET '{}'".format(engine, sheet_name))
+                            df.to_excel(filepath, engine=engine, sheet_name=sheet_name)
+                        elif type == "json":
+                            df.to_json(filepath)
+                        print("RETURNING THE .{} FILE-PATH -> {}".format(type, filepath))
+                        return filepath
+            except Exception as e:
+                print("ERROR DURING PROCESSING OF FILE -> {}".format(e))
             return None
 
         try:
-            print()
             print("PARAMS FOR RETRIEVING FILE -> {}".format(extra))
             df = None
             if ("source" in extra):

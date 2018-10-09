@@ -53,7 +53,7 @@
                         </div>
                         <div class="form-group">
                             <label for="filename">Select File</label>
-                            <input type="file" class="form-control" id="filename" name="file">
+                            <input type="file" class="form-control" id="filename" name="filename">
                         </div>
                         <div class="form-group">
                             <button type="submit" class="uploaddownloadFormSubmit btn btn-default">Upload</button>
@@ -88,11 +88,11 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <input id="downloadcollection" class="form-control " name="collection" type="text"
+                    <input id="downloadcollection" class="form-control " name="downloadcollection" type="text"
                            placeholder="Collection Name">
                 </div>
                 <div class="form-group">
-                    <input id="downloadfilename" class="form-control " name="filename" type="text"
+                    <input id="downloadfilename" class="form-control " name="downloadfilename" type="text"
                            placeholder="Download File Name">
                 </div>
                 <div class="form-group">
@@ -185,7 +185,7 @@
     window.localStorage.setItem("deleteId", "");
 
     window.onload = function () { // <span class="caret"></span>
-        function handleResponse(data){
+        function handleResponse(data) {
             console.log(JSON.stringify(data));
             if (data.hasOwnProperty("data")) data = data["data"];
             return data;
@@ -363,12 +363,21 @@
             });
         }
 
+        async function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         $('.uploaddownloadFormSubmit').click(function (e) {
             e.preventDefault();
             console.log("PREVENTING RELOADING OF THIS PAGE, BUT STILL CALLING FORM'S 'onSubmit'");
             $('#uploaddownloadForm').submit();
         });
-        $("#uploaddownloadForm").submit(function (e) {
+        $("#uploaddownloadForm").submit(async function (e) {
             e.preventDefault();
             // VALIDATION
             if (( $("#collection").val().length <= 0 ) ||
@@ -396,56 +405,59 @@
 
             var data = {
                 category: window.localStorage.getItem("chosenCategory")
-            }, formData = null;
+            }, formData = null, options = {
+                contentType: false,
+                processData: false,
+                cache: false,
+            };
+
             if (download == 'true') {
                 url += "/download";
-                data['collection'] = {
-                    collection: $("#downloadcollection").val(), filename: $("#downloadfilename").val()
-                }
+                data['collection'] = $("#downloadcollection").val();
+                data['filename'] = $("#downloadfilename").val();
+                data['file_type'] = $("#downloadfile_type").val();  // FIND A WAY TO GET THIS
+                //
+                data = JSON.stringify(data);
+                //
+                options["dataType"] = "json";
+                options["contentType"] = "application/json";
+                //
             } else {
                 url += "/upload";
-                data['collection'] = {
-                    collection: $("#collection").val(), filename: $("#filename").val(),
-                    {#                    file: $('#filename').attr('files')[0]  // THIS RETRIEVES THE FILE TO BE UPLOADED :)#}
-                };
-                console.log("DATA BEFORE FormData -> " + JSON.stringify(data));
-                formData = new FormData($('#uploaddownloadForm')[0]);
-                formData.append("category", window.localStorage.getItem("chosenCategory"));
-                {#                data = null; data = formData;#}
-                console.log("DATA AFTER FormData -> " + JSON.stringify(formData));
+                var f = $('#filename').prop('files')[0];
+                //
+                data = null;
+                data = new FormData();
+                data.append('collection', $("#collection").val());
+                data.append('filename', f.name);
+                data.append('file', f);
+                data.append('category', window.localStorage.getItem("chosenCategory"));
+                //
             }
-
-            console.log("URL -> " + url + "?" + query);
-            console.log("METHOD -> " + meth);
-            console.log("DATA -> " + JSON.stringify(data));
-
-            // UPLOAD MODE WILL BE IN 'multipart/form-data'
-            // DOWNLOAD MODE WILL BE IN 'application/json', BUT RESULT IN A FILE
-
-            $.ajax({
-                url: url, type: meth, dataType: "json", enctype: "multipart/form-data", data: data,
-                {#                processData: false,#}
-                {#                contentType: false,#}
-                {#                cache: false,#}
-                {#                timeout: 600000,#}
-                success: function (data) {
-                    console.log("DATA UPLOADED/DOWNLOADED -> " + JSON.stringify(data));
-                    console.log("RELOADING DATA ...");
-                    getData();
-                }, error: function (err) {
-                    alert("Sorry, some error occured");
-                    console.log("ERROR -> " + err);
-                },
-                complete: function () {
-                    window.localStorage.setItem("downloadMode", false);
-                    window.localStorage.setItem("downloadId", "");
-                    window.localStorage.setItem("deleteId", "");
-                    $("#collection").val("");
-                    $("#filename").val("");
-                    $("#downloadcollection").val("");
-                    $("#downloadfilename").val("");
-                }
-            });
+            //
+            options["url"] = url;
+            options["type"] = meth;
+            options["data"] = data;
+            console.log("FINAL OPTIONS -> " + JSON.stringify(options));
+            options["success"] = function (data) {
+                data = handleResponse(data); // WORK WITH data HOWEVER YOU PREFER
+                console.log("RELOADING DATA ...");
+                getData();
+            };
+            options["error"] = function (err) {
+                alert("Sorry, some error occured");
+                console.log("ERROR -> " + err);
+            };
+            options["complete"] = function () {
+                window.localStorage.setItem("downloadMode", false);
+                window.localStorage.setItem("downloadId", "");
+                window.localStorage.setItem("deleteId", "");
+                $("#collection").val("");
+                $("#filename").val("");
+                $("#downloadcollection").val("");
+                $("#downloadfilename").val("");
+            };
+            $.ajax(options);
         });
 
         setupOnListItemClick(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT

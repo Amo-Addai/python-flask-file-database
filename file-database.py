@@ -13,7 +13,14 @@ app = server.setup_db_and_file_system(app)
 print("Server, Database, and File System have all been set up successfully!!")
 print()
 default_filter, default_category, default_collection, default_filename, default_file_type = "all", "All", "Examination", "", ""
-response_message, response_data = "Sorry, some error occurred.", {}
+request_data, response_message, response_data = {}, "Sorry, some error occurred.", {}
+
+
+def get_request_data():
+    global request_data
+    data = request_data
+    request_data = {}
+    return data
 
 
 def get_response_message():
@@ -35,21 +42,20 @@ def allowed_files(filename):
     return '.' in filename and ext in ALLOWED_EXTENSIONS, ext
 
 
-def render_home():
-    return render_template('home.html', ALLOWED_EXTENSIONS=ALLOWED_EXTENSIONS)
-
-
 def return_response(success):
     global response_message, response_data
-    print("NOW, RETURN RESPONSE ...\nMESSAGE: '{}'\nDATA: {}".format(response_message, response_data))
     final_data = {'success': success, 'message': get_response_message(), 'data': get_response_data()}
-    print("FINAL DATA -> {}".format(final_data))
+    print("NOW, RETURN RESPONSE -> {}".format(final_data))
     response = app.response_class(
         response=json.dumps(final_data),
         status=200 if success else 400,
         mimetype='application/json'
     )
     return response
+
+
+def render_home():
+    return render_template('home.html', ALLOWED_EXTENSIONS=ALLOWED_EXTENSIONS)
 
 
 @app.route('/')
@@ -76,26 +82,66 @@ def delete_collection_data():
     pass
 
 
-@app.route('/api/collections/download', methods=['GET', 'POST'])
-def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
-    global response_message, response_data
-    if request.method == 'POST':  # and request.form:
-        extra = {
-            'body': request.form
-        }  # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
-        extra["filter"] = default_filter if (
-            ("filter" not in extra["body"]) or (len(extra["body"]["filter"]) <= 0)) else extra["body"]["filter"]
-        extra["collection"] = default_collection if (
-            ("collection" not in extra["body"]) or (len(extra["body"]["collection"]) <= 0)) else extra["body"][
-            "collection"]
+@app.route('/api/collections/upload', methods=['POST'])
+def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
+    global request_data, response_message, response_data
+    if request.method == 'POST':
+        request_data, extra = request.form, {}
+        print("REQUEST -> {}".format(request_data))
         extra["category"] = default_category if (
-            ("category" not in extra["body"]) or (len(extra["body"]["category"]) <= 0)) else extra["body"][
+            ("category" not in request_data) or (len(request_data["category"]) <= 0)) else request_data[
             "category"]
+        extra["collection"] = default_collection if (
+            ("collection" not in request_data) or (len(request_data["collection"]) <= 0)) else request_data[
+            "collection"]
         extra["filename"] = default_filename if (
-            ("filename" not in extra["body"]) or (len(extra["body"]["filename"]) <= 0)) else extra["body"]["filename"]
+            ("filename" not in request_data) or (len(request_data["filename"]) <= 0)) else request_data["filename"]
+        #
+        if 'file' not in request.files:
+            response_message = "No file within data"
+            return return_response(False)
+        file = request.files['file']
+        if file.filename == '':
+            response_message = "No selected file"
+            return return_response(False)
+        file_is_allowed, extra["file_type"] = allowed_files(extra["filename"])
+        #
+        if file and file_is_allowed:
+            filename = extra["filename"] = secure_filename(extra["filename"])
+            print("Now handling file '{}' -> {}".format(filename, file))
+            print("With params -> {}".format(extra))
+            if server.handle_file(file, extra):
+                response_message, response_data = "Server handled file '{}' successfully.".format(filename), {
+                    # FIGURE OUT WHAT RESPONSE DATA TO PUT IN HERE :)
+                }
+                return return_response(True)
+            else:
+                response_message = "Server could not handle file '{}' successfully.".format(filename)
+        return return_response(False)
+    return return_response(False)
+
+
+@app.route('/api/collections/download', methods=['POST'])
+def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
+    global request_data, response_message, response_data
+    if request.method == 'POST':
+        request_data, extra = request.get_json(), {}
+        print("REQUEST -> {}".format(request_data))
+        extra = {}
+        extra["category"] = default_category if (
+            ("category" not in request_data) or (len(request_data["category"]) <= 0)) else request_data[
+            "category"]
+        extra["collection"] = default_collection if (
+            ("collection" not in request_data) or (len(request_data["collection"]) <= 0)) else request_data[
+            "collection"]
+        extra["filename"] = default_filename if (
+            ("filename" not in request_data) or (len(request_data["filename"]) <= 0)) else request_data["filename"]
         extra["file_type"] = default_file_type if (
-            ("file_type" not in extra["body"]) or (len(extra["body"]["file_type"]) <= 0)) else extra["body"][
+            ("file_type" not in request_data) or (len(request_data["file_type"]) <= 0)) else request_data[
             "file_type"]
+        # extra["filter"] = default_filter if (
+        #     ("filter" not in request_data) or (len(request_data["filter"]) <= 0)) else request_data["filter"]
+        #
         filename, filter = secure_filename(extra["filename"]), extra["body"]["filter"]
         print("Now requesting file '{}'".format(filename))
         print("With parameters -> {}".format(extra))
@@ -107,45 +153,6 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
             return return_response(True)
         else:
             response_message = "Server could not handle file-request '{}' successfully".format(filename)
-        return return_response(False)
-    return return_response(False)
-
-
-@app.route('/api/collections/upload', methods=['GET', 'POST'])
-def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
-    global response_message, response_data
-    if request.method == 'POST':  # and request.form:
-        extra = {
-            'body': request.form
-        }  # FIND A WAY TO ASSIGN THE THESE PARAMS GENERICALLY
-        extra["collection"] = default_collection if (
-            ("collection" not in extra["body"]) or (len(extra["body"]["collection"]) <= 0)) else extra["body"][
-            "collection"]
-        extra["category"] = default_category if (
-            ("category" not in extra["body"]) or (len(extra["body"]["category"]) <= 0)) else extra["body"][
-            "category"]
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            response_message = "No file within data"
-            return return_response(False)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            response_message = "No selected file"
-            return return_response(False)
-        file_is_allowed, extra["file_type"] = allowed_files(file.filename)
-        if file and file_is_allowed:
-            filename = secure_filename(file.filename)
-            print("Now handling file '{}'".format(filename))
-            extra["filename"] = filename  # FIND A WAY TO ASSIGN THE COLLECTION GENERICALLY
-            if server.handle_file(file, extra):
-                response_message, response_data = "Server handled file '{}' successfully.".format(filename), {
-                    # FIGURE OUT WHAT RESPONSE DATA TO PUT IN HERE :)
-                }
-                return return_response(True)
-            else:
-                response_message = "Server could not handle file '{}' successfully.".format(filename)
         return return_response(False)
     return return_response(False)
 

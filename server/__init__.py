@@ -105,6 +105,12 @@ class Server:
         return False
 
     def handle_file(self, file, extra):
+        def save_to_file_system(fs):
+            #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!
+            if ("save_to_file_system" in extra) and (extra["save_to_file_system"]):
+                print("Saving file to the file system too")
+                fs.save_file(file, extra)
+
         df = None
         try:
             if 'file_type' in extra:
@@ -114,19 +120,18 @@ class Server:
                 elif type == "tsv":
                     df.read_csv(file, sep='\t')
                 elif (type == "xls") or (type == "xlsx"):
+                    print("a")
                     df = pd.read_excel(file)
             if df is not None:
                 print(df.head())
                 if self.retrieve_data_from_file(df, extra):
-                    #   DECIDE WHETHER TO SAVE THIS FILE IN THE UPLOAD FOLDER OR NOT 1ST!!!
-                    if ("save_to_file_system" in extra) and (extra["save_to_file_system"]):
-                        print("Saving file to the file system too")
-                        self.file_system.save_file(file, extra)
+                    save_to_file_system(self.file_system)
                     return True
                 else:  # YOU CAN ALSO SAVE THE FILE WITHIN THE FILE-SYSTEM, IN CASE DATA CANNOT BE RETRIEVED ..
                     pass
         except Exception as e:
             print("SOME ERROR OCCURRED (handle_file()) -> {}".format(e))
+            save_to_file_system(self.file_system)  # IN CASE OF ANY ERRORS, YOU CAN ALSO SAVE FILE TO THE FILE SYSTEM :)
         print("COULDN'T RETRIEVE DATA FROM THE FILE")
         return False
 

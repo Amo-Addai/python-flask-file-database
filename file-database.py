@@ -162,9 +162,10 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         if filepath is not None:
             # uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
             # return send_from_directory(directory=uploads, filename=filename)
-            response_message, response_data = "Server handled file-download request '{}' successfully".format(filename), {
+            response_message, response_data = "Server handled file-download request '{}' successfully".format(
+                filename), {
 
-            }
+                                              }
             return return_response(True)
         else:
             response_message = "Server could not handle file-download request '{}' successfully".format(filename)

@@ -43,7 +43,7 @@ class Database:
         for collection in self.db.list_collection_names():
             print("Clearing Database Collection '{}'".format(self.db[collection].remove()))
             self.db[collection].drop()
-        #   THEN, CREATE THE MAIN 'Collection' COLLECTION
+        # THEN, CREATE THE MAIN 'Collection' COLLECTION
         print("NOW, CREATING THE 'Collection' COLLECTION".format(self.db[COLLECTION]))
         # THEN, TEST THE DATABASE CRUD OPERATIONS
         category, obj1, obj2, obj3 = "All", {"hello": "world1"}, {"hello": "world2"}, {"hello": "world3"}
@@ -127,7 +127,8 @@ class Database:
                 if 'collection' in collection_obj:
                     collection = collection_obj["collection"]
                     print("Now, Clearing Database Collection '{}' -> {} item(s)".format(self.db[collection].remove(),
-                                                                                        self.db[collection].find().count()))
+                                                                                        self.db[
+                                                                                            collection].find().count()))
                     print("DELETING COLLECTION '{}' -> {}".format(collection, extra["_id"]))
                     self.db[collection].drop()
                     return True

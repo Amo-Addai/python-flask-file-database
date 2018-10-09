@@ -219,8 +219,8 @@
                             $("#downloadcollection").val(obj.collection || "");
                             // MAKE SURE YOU 1ST REMOVE THE EXTENSION .ext FROM  STRING :)
                             var x = obj.filename;
-                            var ext = x.substring(x.lastIndexOf('.')+1, x.length);
-                            var fname = x.replace("."+ext, ""); // GET VALUES FOR THESE, FROM obj.filename
+                            var ext = x.substring(x.lastIndexOf('.') + 1, x.length);
+                            var fname = x.replace("." + ext, ""); // GET VALUES FOR THESE, FROM obj.filename
                             console.log(fname + " : " + ext);
                             $("#downloadfilename").val(fname || "");
                             $("#downloadfile_type").val(ext || "xlsx" || "");

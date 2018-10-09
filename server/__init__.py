@@ -42,31 +42,55 @@ class Server:
 
     def retrieve_file_from_database_or_file_system(self, filter, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):
+            def to_xml(df, filename=None, mode='w'):
+                def row_to_xml(row):
+                    xml = ['<item>']
+                    for i, col_name in enumerate(row.index):
+                        xml.append('  <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+                    xml.append('</item>')
+                    return '\n'.join(xml)
+
+                res = "{}\n{}\n{}".format('<xml>', ('\n'.join(df.apply(row_to_xml, axis=1))), '</xml>')
+                if filename is None:
+                    return res
+                with open(filename, mode) as f:
+                    f.write(res)
+
             try:
                 print()
                 print("NOW PROCESSING FILE -> {}".format(extra))
                 if (extra is not None) and ("file_type" in extra) and ("filename" in extra):
-                    type, file, filepath = extra["file_type"], None, None
+                    type, file, filepath, filename = extra["file_type"], None, None, None
                     if (len(extra["filename"]) > 0) and (len(type) > 0):
-                        filepath = r'{}{}.{}'.format(DOWNLOAD_FOLDER, extra["filename"], type)
+                        filename = "{}.{}".format(extra["filename"], type)
+                        filepath = "{}{}".format(DOWNLOAD_FOLDER, filename)
                         print("PATH -> '{}'".format(filepath))
                         if type == "csv":
                             df.to_csv(filepath, sep=',')
                         elif type == "tsv":
                             df.to_csv(filepath, sep='\t')
                         elif (type == "xls") or (type == "xlsx"):
-                            engine = "xlsxwriter"  # "openpyxl"  # FIND OUT THE BEST ENGINE TO USE TO CREATE THE EXCEL FILE :)
                             sheet_name = extra["collection"] if (
                                 ("collection" in extra) and (len(extra["collection"]) > 0)) else "Sheet1"
-                            print("EXCEL ENGINE '{}' & SHEET '{}'".format(engine, sheet_name))
-                            df.to_excel(filepath, engine=engine, sheet_name=sheet_name)
+                            print("EXCEL SHEET '{}'".format(sheet_name))
+                            df.to_excel(filepath, sheet_name=sheet_name)
+                        elif type == "html":
+                            df.to_html(filepath)
                         elif type == "json":
-                            df.to_json(filepath)
+                            print("JSON STRING -> {}".format(df.to_json()))
+                            df.to_json(filepath, orient='index')  # CANNOT CONVERT TO .json FILE WITHOUT PROPERLY :(
+                        elif type == "xml":  # ASSIGNING CUSTOM to_xml() FUNCTION
+                            pd.DataFrame.to_xml = to_xml
+                            df.to_xml(filepath)  # WHEN RETURNED TO CLIENT, RESPONSE IS IN .error() CALLBACK :(
+                        elif type == "txt":
+                            pass
+                        elif type == "pdf":
+                            pass
                         print("RETURNING THE .{} FILE-PATH -> {}".format(type, filepath))
-                        return filepath
+                        return filepath, filename
             except Exception as e:
                 print("ERROR DURING PROCESSING OF FILE -> {}".format(e))
-            return None
+            return None, None
 
         try:
             print("PARAMS FOR RETRIEVING FILE -> {}".format(extra))

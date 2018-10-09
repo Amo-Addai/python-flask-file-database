@@ -159,7 +159,7 @@
 
     window.onload = function () { // <span class="caret"></span>
         function handleResponse(data) {
-            console.log(JSON.stringify(data));
+            console.log(data);
             if (data.hasOwnProperty("data")) data = data["data"];
             return data;
         }
@@ -217,6 +217,7 @@
                             window.localStorage.setItem("downloadMode", true);
                             window.localStorage.setItem("downloadId", obj._id || "");
                             $("#downloadcollection").val(obj.collection || "");
+                            $("#downloadcollection").prop("disabled", true);
                             // MAKE SURE YOU 1ST REMOVE THE EXTENSION .ext FROM  STRING :)
                             var x = obj.filename;
                             var ext = x.substring(x.lastIndexOf('.') + 1, x.length);
@@ -335,8 +336,10 @@
                 //
                 data = JSON.stringify(data);
                 //
-                options["dataType"] = "json";
                 options["contentType"] = "application/json";
+                options["headers"] = {
+                    Accept: "*/*" // "application/download"  //
+                }
                 //
             } else {
                 url += "/upload";
@@ -357,12 +360,28 @@
             console.log("FINAL OPTIONS -> " + JSON.stringify(options));
             options["success"] = function (data) {
                 data = handleResponse(data); // WORK WITH data HOWEVER YOU PREFER
+                // FOR INSTANCE, IF THIS WAS A DOWNLOAD REQUEST, PREPARE THE FILE FOR THE CLIENT
+                if (download == 'true') {
+                    console.log("PREPARING DOWNLOADED FILE -> " + (typeof data));
+
+                    {#                    var disp = request.getResponseHeader('Content-Disposition');#}
+                    {#                    if (disp && disp.search('attachment') != -1) {#}
+                    {#                        var form = $('<form method="POST" action="' + url + '">');#}
+                    {#                        $.each(params, function(k, v) {#}
+                    {#                            form.append($('<input type="hidden" name="' + k +#}
+                    {#                                    '" value="' + v + '">'));#}
+                    {#                        });#}
+                    {#                        $('body').append(form);#}
+                    {#                        form.submit();#}
+                    {#                    }#}
+                }
                 console.log("RELOADING DATA ...");
                 getData();
             };
             options["error"] = function (err) {
-                alert("Sorry, some error occured");
-                console.log("ERROR -> " + err);
+{#                alert("Sorry, some error occured");#}
+                console.log("ERROR -> " + JSON.stringify(err));
+                console.log(e);
             };
             options["complete"] = function () {
                 window.localStorage.setItem("downloadMode", false);

@@ -1,11 +1,16 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
+from flask import Flask, request, render_template, send_file, send_from_directory, redirect, url_for, flash
 from werkzeug.utils import secure_filename
-import json
+import json, os
 
 from server import Server
 
-ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv', 'json', 'xml', 'txt', 'pdf'])
+ALLOWED_EXTENSIONS = set(['csv', 'tsv', 'xls', 'xlsx', 'json', 'xml', 'html', 'txt', 'pdf'])
 CATEGORIES = set(['All'])
+
+# os.path.join(current_directory, "/server/downloads/") OR os.getcwd()
+current_directory = os.path.dirname(os.path.realpath(__file__))
+DOWNLOAD_FOLDER = current_directory + "/server/downloads/"
+# print(DOWNLOAD_FOLDER)  # 'C:\Users\kwadw\Desktop\file-database/server/downloads/
 
 app = Flask(__name__)
 server = Server()
@@ -49,7 +54,7 @@ def return_response(success):
     print("NOW, RETURN RESPONSE -> {}".format(final_data))
     response = app.response_class(
         response=json.dumps(final_data),
-        status=200 if success else 400,
+        status=200 if success else 300,
         mimetype='application/json'
     )
     return response
@@ -158,14 +163,19 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         filename, filter = extra["filename"], extra["filter"]
         print("Now requesting file '{}'".format(filename))
         print("With parameters -> {}".format(extra))
-        filepath = server.request_file(filter, extra)
-        if filepath is not None:
-            # uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
-            # return send_from_directory(directory=uploads, filename=filename)
-            response_message, response_data = "Server handled file-download request '{}' successfully".format(
-                filename), {
-
-                                              }
+        filepath, filename = server.request_file(filter, extra)
+        if (filepath is not None) and (filename is not None):
+            try:
+                # uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
+                # return send_from_directory(directory=uploads, filename=filename)
+                response_message, response_data = "Server handled file-download request '{}' successfully".format(
+                    filename), {}
+                print("Now attempting to send file '{}' to client for download -> {}".format(filename, filepath))
+                # return send_file(filepath, as_attachment=True, attachment_filename=filename,
+                #                  mimetype='application/octet-stream')
+                return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True, attachment_filename=filename)
+            except Exception as e:
+                print("ERROR -> {}".format(e))
             return return_response(True)
         else:
             response_message = "Server could not handle file-download request '{}' successfully".format(filename)

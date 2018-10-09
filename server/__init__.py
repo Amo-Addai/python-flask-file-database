@@ -32,6 +32,9 @@ class Server:
         print("JSON DATA -> {}".format(json_data))
         return json_data
 
+    def delete_collection(self):
+        pass
+
     def retrieve_file_from_database_or_file_system(self, filter, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):
             print()
@@ -92,11 +95,14 @@ class Server:
             if err is None:
                 for index, row in df.iterrows():
                     try:
+                        print()
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
                         success = self.database.save_data_object(row.to_dict(), extra)
                         # WORK WITH success HOWEVER YOU WANT ..
+                        print()
                     except Exception as e:
                         print("ERROR IN SAVING OBJECT -> {}".format(e))
+                print()
                 return True
             else:
                 print("Error during preprocessing of the Data")

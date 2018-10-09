@@ -45,6 +45,7 @@ def allowed_files(filename):
 def return_response(success):
     global response_message, response_data
     final_data = {'success': success, 'message': get_response_message(), 'data': get_response_data()}
+    print()
     print("NOW, RETURN RESPONSE -> {}".format(final_data))
     response = app.response_class(
         response=json.dumps(final_data),

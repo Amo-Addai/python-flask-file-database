@@ -18,10 +18,10 @@ COLLECTION = "Collection"
 class Database:
     db, encryption = None, None
     default_filter = "all"
-    default_collection = "Examination"
-    default_filename = ""
+    default_collection = "New Collection"
+    default_filename = "New File"
     default_category = "All"
-    default_file_type = ""
+    default_file_type = "xlsx"
 
     def __init__(self):
         self.encryption = self.Encryption()
@@ -41,7 +41,7 @@ class Database:
         #   FIRST, TEST THE DATABASE CRUD OPERATIONS
         category, obj1, obj2, obj3 = "All", {"hello": "world1"}, {"hello": "world2"}, {"hello": "world3"}
         for collection in DATABASE["collections"]:
-            if self.validate_collection({'collection': collection, 'category': category}):
+            if self.validate_collection({'filename': '', 'collection': collection, 'category': category}):
                 print("Creating Database Collection '{}' -> {}".format(collection, self.db[collection]))
                 print("Now, Clearing Database Collection '{}' -> {} item(s)".format(self.db[collection].remove(),
                                                                                     self.db[collection].find().count()))
@@ -69,8 +69,11 @@ class Database:
         print("GETTING COLLECTIONS WITHIN CATEGORY '{}'".format(category))
         # data = self.db[COLLECTION].find()  # THESE 2 CAN BOTH WORK
         # data = [x for x in data if (category in x["categories"])]
-        cursor, data = self.db[COLLECTION].find({'categories':category}), []
+        cursor, data = self.db[COLLECTION].find({'categories': category}), []
         for o in cursor:
+            if "_id" in o:
+                print("CONVERTING OBJECT-ID TO STRING -> {}".format(o["_id"]))
+                o["_id"] = str(o["_id"])
             data.append(o)
         print("{} COLLECTION(S) -> {}".format(len(data), data))
         return data
@@ -79,6 +82,7 @@ class Database:
         def create_new_collection(col, file, cat):
             obj = {'collection': col, 'filename': file, 'categories': ["All"]}
             if cat not in obj["categories"]:
+                print("Appending new category '{}' to collection '{}'".format(cat, col))
                 obj["categores"].append(cat)
             print("New Collection Object -> {}".format(obj))
             return obj
@@ -88,8 +92,8 @@ class Database:
             collection = extra["collection"]
             filename = extra["filename"] if ("filename" in extra) else self.default_filename
             category = extra["category"] if ("category" in extra) else self.default_category
-
-            print("NOW, VALIDATING COLLECTION ''".format(collection))
+            #
+            print("NOW, VALIDATING COLLECTION '{}'".format(collection))
             # CHECK IF collection ALREADY EXISTS WITHIN THE DB, IF NOT, THEN ADD IT
             if category in DATABASE["categories"]:
                 if collection not in self.db.list_collection_names():
@@ -97,7 +101,8 @@ class Database:
                     self.db[COLLECTION].insert(create_new_collection(collection, filename, category), check_keys=False)
                     print("Done testing, Clearing Database Collection '{}' again -> {} item(s)"
                           .format(self.db[collection].remove(), self.db[collection].find().count()))
-                    print()
+                else:
+                    print("NO NEED TO VALIDATE, COLLECTION '{}' ALREADY EXISTS".format(collection))
                 print("FINALLY, DONE WITH VALIDATION OF COLLECTION '{}'".format(collection))
                 return collection
             print("SORRY, THIS CATEGORY '{}' IS NOT ALLOWED :(".format(category))

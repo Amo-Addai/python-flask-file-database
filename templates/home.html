@@ -376,13 +376,16 @@
             var id = window.localStorage.getItem("deleteId"), url = window.localStorage.getItem('api') + "collections",
                 meth = "DELETE", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
                 query = ""; // "category=" + window.localStorage.getItem("chosenCategory");
-            if ((id !== null) && (id.length > 0)) url += "/" + id;
-            else {
+            if ((id !== null) && (id.length > 0)) {
+                query = "?category=" + window.localStorage.getItem("chosenCategory") + "&_id=" + id;
+                url += query; // APPEND THE QUERY STRING COZ .ajax() SOMETIMES DOESN'T SEND ANY JSON DATA WITH A 'DELETE' HTTP REQUEST
+            } else {
                 console.log("NO ITEM SELECTED TO BE DELETED");
                 return;
             }
             var data = {
-                category: window.localStorage.getItem("chosenCategory")
+                category: window.localStorage.getItem("chosenCategory"),
+                _id: id
             };
             console.log("ID !!!! -> " + id);
             console.log("URL -> " + url + "?" + query);
@@ -391,6 +394,7 @@
 
             $.ajax({
                 url: url, type: meth, dataType: "json", data: data,
+                contentType: "application/json",
                 success: function (data) {
                     console.log("DATA DELETED -> " + JSON.stringify(data));
                     console.log("RELOADING DATA ...");

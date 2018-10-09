@@ -32,8 +32,13 @@ class Server:
         print("JSON DATA -> {}".format(json_data))
         return json_data
 
-    def delete_collection(self):
-        pass
+    def delete_collection(self, extra):
+        try:
+            print("ABOUT TO DELETE COLLECTION WITH PARAMS -> {}".format(extra))
+            return self.database.delete_collection(extra)
+        except Exception as e:
+            print("ERROR WHILE DELETING COLLECTION -> {}".format(e))
+        return False
 
     def retrieve_file_from_database_or_file_system(self, filter, extra):  # RETRIEVE THE DATA FROM DB & PREPARE FILE
         def processFile(df, extra=None):

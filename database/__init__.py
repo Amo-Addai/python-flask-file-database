@@ -1,4 +1,5 @@
-import pymongo, datetime
+import datetime, pymongo
+from bson.objectid import ObjectId
 
 # from Crypto.Cipher import AES
 
@@ -115,6 +116,26 @@ class Database:
             data.append(o)
         print("{} COLLECTION(S) -> {}".format(len(data), data))
         return data
+
+    def delete_collection(self, extra):
+        if '_id' in extra:
+            filter = {'_id': ObjectId(extra["_id"])}
+            collection_obj = self.db[COLLECTION].find_one(filter)
+            print("COLLECTION OBJECT TO BE DELETED -> {}".format(collection_obj))
+            if self.db[COLLECTION].delete_many(filter).deleted_count > 0:
+                print("DELETED COLLECTION OBJECT -> {} OBJECT(S) LEFT".format(self.db[COLLECTION].find().count()))
+                if 'collection' in collection_obj:
+                    collection = collection_obj["collection"]
+                    print("Now, Clearing Database Collection '{}' -> {} item(s)".format(self.db[collection].remove(),
+                                                                                        self.db[collection].find().count()))
+                    print("DELETING COLLECTION '{}' -> {}".format(collection, extra["_id"]))
+                    self.db[collection].drop()
+                    return True
+                print("SORRY, COULD NOT DELETE THE COLLECTION ITSELF")
+            print("SORRY, COULD NOT DELETE THE COLLECTION OBJECT")
+        else:
+            print("NO OBJECT-ID AVAILABLE")
+        return False
 
     def get_data(self, filter=None, extra=None):
         collection = self.validate_collection(extra)

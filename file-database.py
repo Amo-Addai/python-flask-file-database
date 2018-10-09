@@ -66,7 +66,7 @@ def home():
 
 @app.route('/api/collections', methods=['GET'])
 def get_collections_data():
-    global response_message, response_data
+    global request_data, response_message, response_data
     query = request.args if (request.args is not None) else {"category": "All"}
     if ("category" not in query) or (len(query["category"]) <= 0):
         query["category"] = "All"
@@ -79,8 +79,21 @@ def get_collections_data():
 
 @app.route('/api/collections', methods=['DELETE'])
 def delete_collection_data():
-    global response_message, response_data
-    pass
+    global request_data, response_message, response_data
+    if request.method == 'DELETE':
+        request_data, extra = request.args, {}
+        print("REQUEST -> {}".format(request_data))
+        extra["category"] = default_category if (
+            ("category" not in request_data) or (len(request_data["category"]) <= 0)) else request_data[
+            "category"]
+        if "_id" in request_data:
+            extra["_id"] = request_data["_id"]
+            if server.delete_collection(extra):
+                response_message = "Collection deleted successfully"
+                return return_response(True)
+            response_message = "Collection could not be deleted successfully"
+        response_message = "Collection not selected correctly"
+    return return_response(False)
 
 
 @app.route('/api/collections/upload', methods=['POST'])
@@ -126,9 +139,8 @@ def upload_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
 def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
     global request_data, response_message, response_data
     if request.method == 'POST':
-        request_data, extra = request.get_json(), {}
+        request_data, extra = request.get_data(), {}
         print("REQUEST -> {}".format(request_data))
-        extra = {}
         extra["category"] = default_category if (
             ("category" not in request_data) or (len(request_data["category"]) <= 0)) else request_data[
             "category"]

@@ -5,7 +5,7 @@ import json
 from server import Server
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv', 'json', 'xml', 'txt', 'pdf'])
-CATEGORIES = set([])
+CATEGORIES = set(['All'])
 
 app = Flask(__name__)
 server = Server()
@@ -56,7 +56,7 @@ def return_response(success):
 
 
 def render_home():
-    return render_template('home.html', ALLOWED_EXTENSIONS=ALLOWED_EXTENSIONS)
+    return render_template('home.html', ALLOWED_EXTENSIONS=ALLOWED_EXTENSIONS, CATEGORIES=CATEGORIES)
 
 
 @app.route('/')

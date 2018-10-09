@@ -10,7 +10,7 @@ MONGO_URI = "mongodb://localhost:27017/"
 DATABASE = {
     'name': "ugcs",
     'categories': ["All"],
-    'collections': ["Examination"]
+    'collections': []  # "Examination" (MAKE THIS ARRAY EMPTY SO NO REMNANT COLLECTIONS ARE CREATED WITHIN THE DATABASE
 }
 COLLECTION = "Collection"
 
@@ -33,12 +33,18 @@ class Database:
         dblist = mongoclient.list_database_names()
         print("DATABASES -> {}".format(dblist))
         self.db = mongoclient[name]
-        print("FIRST, CREATING THE 'Collection' COLLECTION".format(self.db[COLLECTION]))
         self.test_db()
         return app
 
     def test_db(self):
-        #   FIRST, TEST THE DATABASE CRUD OPERATIONS
+        #   FIRST, DELETE ALL COLLECTIONS WITHIN THE DATABASE
+        print("FIRST, DELETING ALL THE OTHER COLLECTIONS")
+        for collection in self.db.list_collection_names():
+            print("Clearing Database Collection '{}'".format(self.db[collection].remove()))
+            self.db[collection].drop()
+        #   THEN, CREATE THE MAIN 'Collection' COLLECTION
+        print("NOW, CREATING THE 'Collection' COLLECTION".format(self.db[COLLECTION]))
+        # THEN, TEST THE DATABASE CRUD OPERATIONS
         category, obj1, obj2, obj3 = "All", {"hello": "world1"}, {"hello": "world2"}, {"hello": "world3"}
         for collection in DATABASE["collections"]:
             if self.validate_collection({'filename': '', 'collection': collection, 'category': category}):
@@ -64,19 +70,6 @@ class Database:
                 print("Done testing, Clearing Database Collection '{}' again -> {} item(s)"
                       .format(self.db[collection].remove(), self.db[collection].find().count()))
                 print()
-
-    def get_collections(self, category=default_category):
-        print("GETTING COLLECTIONS WITHIN CATEGORY '{}'".format(category))
-        # data = self.db[COLLECTION].find()  # THESE 2 CAN BOTH WORK
-        # data = [x for x in data if (category in x["categories"])]
-        cursor, data = self.db[COLLECTION].find({'categories': category}), []
-        for o in cursor:
-            if "_id" in o:
-                print("CONVERTING OBJECT-ID TO STRING -> {}".format(o["_id"]))
-                o["_id"] = str(o["_id"])
-            data.append(o)
-        print("{} COLLECTION(S) -> {}".format(len(data), data))
-        return data
 
     def validate_collection(self, extra):
         def create_new_collection(col, file, cat):
@@ -109,6 +102,19 @@ class Database:
         else:
             print("SORRY, THERE IS NO COLLECTION TO VALIDATE :(")
         return None
+
+    def get_collections(self, category=default_category):
+        print("GETTING COLLECTIONS WITHIN CATEGORY '{}'".format(category))
+        # data = self.db[COLLECTION].find()  # THESE 2 CAN BOTH WORK
+        # data = [x for x in data if (category in x["categories"])]
+        cursor, data = self.db[COLLECTION].find({'categories': category}), []
+        for o in cursor:
+            if "_id" in o:
+                print("CONVERTING OBJECT-ID TO STRING -> {}".format(o["_id"]))
+                o["_id"] = str(o["_id"])
+            data.append(o)
+        print("{} COLLECTION(S) -> {}".format(len(data), data))
+        return data
 
     def get_data(self, filter=None, extra=None):
         collection = self.validate_collection(extra)

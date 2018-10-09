@@ -32,9 +32,9 @@
                                 </a>
                                 <ul id="categoriesList" class="dropdown-menu" role="menu">
                                     {# SPECIFY ALL AVALABLE CATEGORIES #}
-                                    <li><a href="#">Item I</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="#">Other</a></li>
+                                    {% for cat in CATEGORIES %}
+                                        <li><a href="#">{{ opt }}</a></li>
+                                    {% endfor %}
                                 </ul>
                             </li>
                         </ul>
@@ -142,33 +142,6 @@
     <!-- /.modal-dialog -->
 </div>
 
-
-{#       UPLOAD DOWNLOAD FORM         #}
-{#     id (collection <- name; file <- email;  )               #}
-{#
-                    <form method=post enctype=multipart/form-data>
-                      <input type=file name=file>
-                      <input type=text name=collection placeholder="Collection Name" />
-                      <input type=submit value=Upload>
-                    </form>
-#}
-{#                #}
-
-{#        upload <- add; download <- edit            #}
-{#
-                    <form method=post enctype=multipart/form-data>
-                        <input type=text name=collection placeholder="Collection Name"/>
-                        <input type=text name=filename placeholder="Download File Name"/>
-                        <select name=file_type placeholder="Download File Type">
-                            {% for opt in ALLOWED_EXTENSIONS %}
-                                <option value="{{ opt }}">{{ opt }}</option>
-                            {% endfor %}
-                        </select>
-                        <input type=submit value=Download>
-                    </form>
-#}
-{#                #}
-
 <script type="text/javascript">
     console.log("HOME PAGE...");
     const URL = "http://localhost:5000/";
@@ -207,60 +180,6 @@
                 console.log(x + " was clicked");
                 getData();
             }
-        });
-
-        $("#yesdelete").click(function (e) { //
-            // e.preventDefault();
-            // e.stopPropagation();
-            var id = window.localStorage.getItem("deleteId");
-            console.log("ID !!!! -> " + id);
-
-            var url = window.localStorage.getItem('api') + "collections",
-                meth = "DELETE", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
-                query = ""; // "category=" + window.localStorage.getItem("chosenCategory");
-            if ((id !== null) && (id.length > 0)) url += "/" + id;
-            else {
-                console.log("NO ITEM SELECTED TO BE DELETED")
-                return;
-            }
-            var data = {
-                category: window.localStorage.getItem("chosenCategory")
-            }
-            console.log("URL -> " + url + "?" + query);
-            console.log("METHOD -> " + meth);
-            console.log("DATA -> " + JSON.stringify(data));
-
-            $.ajax({
-                url: url, type: meth, dataType: "json", data: data,
-                success: function (data) {
-                    console.log("DATA DELETED -> " + JSON.stringify(data));
-                    console.log("RELOADING DATA ...");
-                    getData();
-                }, error: function (err) {
-                    alert("Sorry, some error occured");
-                },
-                complete: function () { // THIS ISN'T REALLY NECESSARY, BUT WHATEVER ...
-                    window.localStorage.setItem("downloadMode", false);
-                    window.localStorage.setItem("downloadId", "");
-                    window.localStorage.setItem("deleteId", "");
-                    $("#collection").val("");
-                    $("#filename").val(""); // THIS ELEM IS AN <input type="file"/> SO WORK WITH IT WELL :)
-                    $("#downloadcollection").val("");
-                    $("#downloadfilename").val("");
-                    $("#downloadfile_type").val(""); // THIS ELEM IS A <select> <option> SO WORK WITH IT WELL :)
-                }
-            });
-        });
-        $("#nodelete").click(function (e) { // YOU CHOOSE NOT TO DO ANY SHIT HERE IF YOU DON'T WANT TO ...
-            // THIS ISN'T REALLY NECESSARY, BUT WHATEVER ...
-            window.localStorage.setItem("downloadMode", false);
-            window.localStorage.setItem("downloadId", "");
-            window.localStorage.setItem("deleteId", "");
-            $("#collection").val("");
-            $("#filename").val(""); // THIS ELEM IS AN <input type="file"/> SO WORK WITH IT WELL :)
-            $("#downloadcollection").val("");
-            $("#downloadfilename").val("");
-            $("#downloadfile_type").val("");  // THIS ELEM IS A <select> <option> SO WORK WITH IT WELL :)
         });
 
         async function getRow(e, thisObj) {
@@ -363,15 +282,6 @@
             });
         }
 
-        async function getBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
         $('.uploaddownloadFormSubmit').click(function (e) {
             e.preventDefault();
             console.log("PREVENTING RELOADING OF THIS PAGE, BUT STILL CALLING FORM'S 'onSubmit'");
@@ -458,6 +368,58 @@
                 $("#downloadfilename").val("");
             };
             $.ajax(options);
+        });
+
+        $("#yesdelete").click(function (e) { //
+            // e.preventDefault();
+            // e.stopPropagation();
+            var id = window.localStorage.getItem("deleteId"), url = window.localStorage.getItem('api') + "collections",
+                meth = "DELETE", // NO NEED FOR QUERY COZ THIS IS A POST REQUEST !!
+                query = ""; // "category=" + window.localStorage.getItem("chosenCategory");
+            if ((id !== null) && (id.length > 0)) url += "/" + id;
+            else {
+                console.log("NO ITEM SELECTED TO BE DELETED");
+                return;
+            }
+            var data = {
+                category: window.localStorage.getItem("chosenCategory")
+            };
+            console.log("ID !!!! -> " + id);
+            console.log("URL -> " + url + "?" + query);
+            console.log("METHOD -> " + meth);
+            console.log("DATA -> " + JSON.stringify(data));
+
+            $.ajax({
+                url: url, type: meth, dataType: "json", data: data,
+                success: function (data) {
+                    console.log("DATA DELETED -> " + JSON.stringify(data));
+                    console.log("RELOADING DATA ...");
+                    getData();
+                }, error: function (err) {
+                    alert("Sorry, some error occured");
+                },
+                complete: function () { // THIS ISN'T REALLY NECESSARY, BUT WHATEVER ...
+                    window.localStorage.setItem("downloadMode", false);
+                    window.localStorage.setItem("downloadId", "");
+                    window.localStorage.setItem("deleteId", "");
+                    $("#collection").val("");
+                    $("#filename").val(""); // THIS ELEM IS AN <input type="file"/> SO WORK WITH IT WELL :)
+                    $("#downloadcollection").val("");
+                    $("#downloadfilename").val("");
+                    $("#downloadfile_type").val(""); // THIS ELEM IS A <select> <option> SO WORK WITH IT WELL :)
+                }
+            });
+        });
+        $("#nodelete").click(function (e) { // YOU CHOOSE NOT TO DO ANY SHIT HERE IF YOU DON'T WANT TO ...
+            // THIS ISN'T REALLY NECESSARY, BUT WHATEVER ...
+            window.localStorage.setItem("downloadMode", false);
+            window.localStorage.setItem("downloadId", "");
+            window.localStorage.setItem("deleteId", "");
+            $("#collection").val("");
+            $("#filename").val(""); // THIS ELEM IS AN <input type="file"/> SO WORK WITH IT WELL :)
+            $("#downloadcollection").val("");
+            $("#downloadfilename").val("");
+            $("#downloadfile_type").val("");  // THIS ELEM IS A <select> <option> SO WORK WITH IT WELL :)
         });
 
         setupOnListItemClick(); // CALL THIS FUNCTION RIGHT AFTER DECLARING IT

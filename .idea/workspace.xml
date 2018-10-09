@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="82fe5e5f-35ff-4ebb-8c56-93b667e38127" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/file-database.py" afterPath="$PROJECT_DIR$/file-database.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/__init__.py" afterPath="$PROJECT_DIR$/server/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/home.html" afterPath="$PROJECT_DIR$/templates/home.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,7 +12,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/file_database$file_database.coverage" NAME="file-database Coverage Results" MODIFIED="1539123646192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/file_database$file_database.coverage" NAME="file-database Coverage Results" MODIFIED="1539125207654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
@@ -22,18 +20,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="home.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="home.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/templates/home.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="380" column="47" lean-forward="true" selection-start-line="380" selection-start-column="47" selection-end-line="380" selection-end-column="47" />
+            <state relative-caret-position="56">
+              <caret line="17" column="34" lean-forward="false" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
               <folding>
-                <element signature="e#8664#9122#0#HTML" expanded="false" />
-                <element signature="e#9166#9550#0#HTML" expanded="false" />
-                <element signature="e#9592#11946#0#HTML" expanded="false" />
-                <element signature="e#11975#14866#0#HTML" expanded="false" />
-                <element signature="e#20099#22396#0#HTML" expanded="false" />
-                <element signature="e#22441#23090#0#HTML" expanded="false" />
+                <element signature="n#form#0;n#div#0;n#div#1;n#div#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="false" />
+                <element signature="e#8891#9349#0#HTML" expanded="false" />
+                <element signature="e#9393#9777#0#HTML" expanded="false" />
+                <element signature="e#9819#12173#0#HTML" expanded="false" />
+                <element signature="e#12202#15093#0#HTML" expanded="false" />
+                <element signature="e#20342#22639#0#HTML" expanded="false" />
+                <element signature="e#22684#23333#0#HTML" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -51,7 +50,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="92">
@@ -110,10 +109,10 @@
         <option value="$PROJECT_DIR$/client/public/js/app.js" />
         <option value="$PROJECT_DIR$/file_system/__init__.py" />
         <option value="$PROJECT_DIR$/database/__init__.py" />
-        <option value="$PROJECT_DIR$/templates/home.html" />
         <option value="$PROJECT_DIR$/server/downloads/sample_data_large.xml" />
         <option value="$PROJECT_DIR$/file-database.py" />
         <option value="$PROJECT_DIR$/server/__init__.py" />
+        <option value="$PROJECT_DIR$/templates/home.html" />
       </list>
     </option>
   </component>
@@ -579,21 +578,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/home.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="380" column="47" lean-forward="true" selection-start-line="380" selection-start-column="47" selection-end-line="380" selection-end-column="47" />
-          <folding>
-            <element signature="e#8664#9122#0#HTML" expanded="false" />
-            <element signature="e#9166#9550#0#HTML" expanded="false" />
-            <element signature="e#9592#11946#0#HTML" expanded="false" />
-            <element signature="e#11975#14866#0#HTML" expanded="false" />
-            <element signature="e#20099#22396#0#HTML" expanded="false" />
-            <element signature="e#22441#23090#0#HTML" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/downloads/sample_data_large.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -626,6 +610,22 @@
           <caret line="78" column="44" lean-forward="false" selection-start-line="78" selection-start-column="44" selection-end-line="78" selection-end-column="44" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/home.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="56">
+          <caret line="17" column="34" lean-forward="false" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
+          <folding>
+            <element signature="n#form#0;n#div#0;n#div#1;n#div#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="false" />
+            <element signature="e#8891#9349#0#HTML" expanded="false" />
+            <element signature="e#9393#9777#0#HTML" expanded="false" />
+            <element signature="e#9819#12173#0#HTML" expanded="false" />
+            <element signature="e#12202#15093#0#HTML" expanded="false" />
+            <element signature="e#20342#22639#0#HTML" expanded="false" />
+            <element signature="e#22684#23333#0#HTML" expanded="false" />
           </folding>
         </state>
       </provider>

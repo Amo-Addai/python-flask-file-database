@@ -12,13 +12,14 @@
 
 </head>
 <body>
-<h1>File Management System</h1>
 
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <h1 class="col-md-offset-4">File Management System</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-9 col-md-offset-2">
             <div class="panel panel-default">
-
                 <div class="panel-heading">
                     <div class="panel-title pull-left">Dashboard</div>
                     <div class="btn-group" style="float: right;">
@@ -43,23 +44,25 @@
                 </div>
                 <br/>
                 {#  PUT FORM FOR UPLOADING FILES HERE  #}
-                <div id="formDiv">
-                    <form id="uploaddownloadForm" class="form-inline" action="#" method="POST"
-                          enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="collection">Collection Name</label>
-                            <input type="text" class="form-control" id="collection"
-                                   name="collection" placeholder="Name of Collection">
-                        </div>
-                        <div class="form-group">
-                            <label for="filename">Select File</label>
-                            <input type="file" class="form-control" id="filename" name="filename">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="uploaddownloadFormSubmit btn btn-default">Upload</button>
-                            <span class="glyphicon glyphicon-upload"></span>
-                        </div>
-                    </form>
+                <div class="row" id="formDiv">
+                    <div class="col-md-offset-1 col-md-20">
+                        <form id="uploaddownloadForm" class="form-inline" action="#" method="POST"
+                              enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="collection">Collection Name</label>
+                                <input type="text" class="form-control" id="collection"
+                                       name="collection" placeholder="Name of Collection">
+                            </div>
+                            <div class="form-group">
+                                <label for="filename">Select File</label>
+                                <input type="file" class="form-control" id="filename" name="filename">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="uploaddownloadFormSubmit btn btn-success">Upload</button>
+                                <span class="glyphicon glyphicon-upload"></span>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <br/>
                 {#     DISPLAY ALL FILES HERE, ACCORDING TO CATEGORIES     #}
@@ -379,7 +382,7 @@
                 getData();
             };
             options["error"] = function (err) {
-{#                alert("Sorry, some error occured");#}
+                {#                alert("Sorry, some error occured");#}
                 console.log("ERROR -> " + JSON.stringify(err));
                 console.log(e);
             };

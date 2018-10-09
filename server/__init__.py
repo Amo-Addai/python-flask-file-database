@@ -76,12 +76,12 @@ class Server:
                             df.to_excel(filepath, sheet_name=sheet_name)
                         elif type == "html":
                             df.to_html(filepath)
-                        elif type == "json":
-                            print("JSON STRING -> {}".format(df.to_json()))
-                            df.to_json(filepath, orient='index')  # CANNOT CONVERT TO .json FILE WITHOUT PROPERLY :(
                         elif type == "xml":  # ASSIGNING CUSTOM to_xml() FUNCTION
                             pd.DataFrame.to_xml = to_xml
                             df.to_xml(filepath)  # WHEN RETURNED TO CLIENT, RESPONSE IS IN .error() CALLBACK :(
+                        elif type == "json":
+                            print("JSON STRING -> {}".format(df.to_json()))
+                            df.to_json(filepath, orient='index')  # CANNOT CONVERT TO .json FILE WITHOUT PROPERLY :(
                         elif type == "txt":
                             pass
                         elif type == "pdf":

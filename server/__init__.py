@@ -83,9 +83,9 @@ class Server:
                             print("JSON STRING -> {}".format(df.to_json()))
                             df.to_json(filepath, orient='index')  # CANNOT CONVERT TO .json FILE WITHOUT PROPERLY :(
                         elif type == "txt":
-                            pass
+                            raise Exception
                         elif type == "pdf":
-                            pass
+                            raise Exception
                         print("RETURNING THE .{} FILE-PATH -> {}".format(type, filepath))
                         return filepath, filename
             except Exception as e:

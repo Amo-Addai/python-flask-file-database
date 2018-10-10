@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, send_from_directory, redirect, url_for, flash
+from flask import Flask, request, render_template, Response, send_file, send_from_directory, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 import json, os
 
@@ -160,26 +160,40 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
         extra["filter"] = default_filter if (
             ("filter" not in request_data) or (len(request_data["filter"]) <= 0)) else request_data["filter"]
         #
-        filename, filter = extra["filename"], extra["filter"]
+        filename, file_type, filter = extra["filename"], extra["file_type"], extra["filter"]
         print("Now requesting file '{}'".format(filename))
         print("With parameters -> {}".format(extra))
         filepath, filename = server.request_file(filter, extra)
         if (filepath is not None) and (filename is not None):
-            try:
-                # uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
-                # return send_from_directory(directory=uploads, filename=filename)
-                response_message, response_data = "Server handled file-download request '{}' successfully".format(
-                    filename), {}
-                print("Now attempting to send file '{}' to client for download -> {}".format(filename, filepath))
-                # return send_file(filepath, as_attachment=True, attachment_filename=filename,
-                #                  mimetype='application/octet-stream')
-                return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True, attachment_filename=filename)
-            except Exception as e:
-                print("ERROR -> {}".format(e))
+            response_message, response_data = "Server handled file-download request '{}' successfully".format(
+                filename), {"filename": filename}
+            print("Now attempting to send file '{}' to client for download -> {}".format(filename, filepath))
             return return_response(True)
         else:
             response_message = "Server could not handle file-download request '{}' successfully".format(filename)
         return return_response(False)
+    return return_response(False)
+
+
+@app.route('/api/collections/download/file', methods=['POST'])
+def download_file():
+    global request_data, response_message, response_data
+    if request.method == 'POST':
+        request_data, extra = request.form, {}
+        print("REQUEST DATA -> {}".format(request_data))
+        try:
+            if "filename" in request_data:
+                filename = request_data["filename"]
+                if len(filename) > 0:
+                    return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True,
+                                               attachment_filename=filename)
+                    # return send_file("{}{}".format(DOWNLOAD_FOLDER, filename), as_attachment=True, attachment_filename=filename,
+                    #                  mimetype='application/octet-stream')
+                    # return Response('data comes here', mimetype='application/octet-stream',
+                    #                  headers={"Content-disposition": "attachment; filename{}".format(filename)})
+                response_message = "Server could not provide download file '{}' successfully".format(filename)
+        except Exception as e:
+            print("ERROR -> {}".format(e))
     return return_response(False)
 
 

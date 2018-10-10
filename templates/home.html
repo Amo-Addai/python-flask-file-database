@@ -362,7 +362,8 @@
                 //
                 options["contentType"] = "application/json";
                 options["headers"] = {
-                    Accept: "*/*" // "application/download"  //
+                    "Accept": "*/*", // "application/download"  //
+                    {#                    "Content-disposition": "attachment"#}
                 }
                 //
             } else {
@@ -382,28 +383,24 @@
             options["type"] = meth;
             options["data"] = data;
             console.log("FINAL OPTIONS -> " + JSON.stringify(options));
-            options["success"] = function (data) {
-                data = handleResponse(data); // WORK WITH data HOWEVER YOU PREFER
+            options["success"] = function (response_data, status, request) {
+                response_data = handleResponse(response_data); // WORK WITH data HOWEVER YOU PREFER
                 // FOR INSTANCE, IF THIS WAS A DOWNLOAD REQUEST, PREPARE THE FILE FOR THE CLIENT
                 if (download == 'true') {
-                    console.log("PREPARING DOWNLOADED FILE -> " + (typeof data));
-
-                    {#                    var disp = request.getResponseHeader('Content-Disposition');#}
-                    {#                    if (disp && disp.search('attachment') != -1) {#}
-                    {#                        var form = $('<form method="POST" action="' + url + '">');#}
-                    {#                        $.each(params, function(k, v) {#}
-                    {#                            form.append($('<input type="hidden" name="' + k +#}
-                    {#                                    '" value="' + v + '">'));#}
-                    {#                        });#}
-                    {#                        $('body').append(form);#}
-                    {#                        form.submit();#}
-                    {#                    }#}
+                    var download_url = url + "/file", filename = response_data["filename"] || null;
+                    if (filename && filename.length > 0) {
+                        console.log("PREPARING DOWNLOAD FILE -> " + filename);
+                        var form = $('<form method="POST" action="' + download_url + '">');
+                        form.append($('<input type="hidden" name="filename" value="' + filename + '">'));
+                        $('body').append(form);
+                        form.submit();
+                    }
                 }
                 console.log("RELOADING DATA ...");
                 getData();
             };
             options["error"] = function (err) {
-                {#                alert("Sorry, some error occured");#}
+                alert("Sorry, some error occured");
                 console.log("ERROR -> " + JSON.stringify(err));
                 console.log(e);
             };

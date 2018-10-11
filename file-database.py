@@ -4,7 +4,7 @@ import json, os
 
 from server import Server
 
-ALLOWED_EXTENSIONS = set(['csv', 'tsv', 'xls', 'xlsx', 'json', 'xml', 'html', 'txt', 'pdf'])
+ALLOWED_EXTENSIONS = set(['csv', 'tsv', 'xls', 'xlsx', 'html', 'xml', 'sql', 'json', 'txt', 'pdf'])
 CATEGORIES = set(['All'])
 
 # os.path.join(current_directory, "/server/downloads/") OR os.getcwd()

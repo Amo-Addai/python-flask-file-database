@@ -79,6 +79,8 @@ class Server:
                         elif type == "xml":  # ASSIGNING CUSTOM to_xml() FUNCTION
                             pd.DataFrame.to_xml = to_xml
                             df.to_xml(filepath)  # WHEN RETURNED TO CLIENT, RESPONSE IS IN .error() CALLBACK :(
+                        elif type == "sql":
+                            df.to_sql(filepath)
                         elif type == "json":
                             print("JSON STRING -> {}".format(df.to_json()))
                             df.to_json(filepath, orient='index')  # CANNOT CONVERT TO .json FILE WITHOUT PROPERLY :(

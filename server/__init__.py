@@ -1,8 +1,10 @@
 import pandas as pd
 import json, os
 from database import Database
+from database.mysql_db import MySQLDatabase
 from file_system import FileSystem
 
+DATABASE_MODE = "MYSQL"
 # os.path.join(current_directory, "/server/downloads/") OR os.getcwd()
 current_directory = os.path.dirname(os.path.realpath(__file__))
 DOWNLOAD_FOLDER = current_directory + "/downloads/"
@@ -17,8 +19,10 @@ class Server:
 
     def setup_db_and_file_system(self, app):  # SETUP THE DATABASE AND FILE SYSTEM ENVIRONMENTS
         self.database = Database()
+        self.mysql_database = MySQLDatabase()
         self.file_system = FileSystem()
         app = self.database.setup_db(app)
+        app = self.mysql_database.setup_mysql_db(app)
         app = self.file_system.setup_file_system(app)
         return app
 
@@ -98,14 +102,19 @@ class Server:
             print("PARAMS FOR RETRIEVING FILE -> {}".format(extra))
             df = None
             if ("source" in extra):
+                data = None
                 if (extra["source"] == "db"):
-                    data = self.database.get_data(filter, extra)  # PUT A COLLECTION STRING AS A PARAM
+                    if DATABASE_MODE == "MONGODB":
+                        data = self.database.get_data(filter, extra)
+                    elif DATABASE_MODE == "MYSQL":  # PUT IN PROPER PARAMS FOR THIS MYSQL-DB METHOD :)
+                        data = self.mysql_database.get_data(filter, extra)
+                    else:
+                        raise Exception("INCORRECT DATABASE MODE SELECTED -> '{}'".format(DATABASE_MODE))
                     if data is not None:
                         df = pd.DataFrame(data)
                 elif (extra["source"] == "fs"):
                     if "filename" in extra:
                         filename = extra["filename"]
-
             if df is not None:
                 print("DATAFRAME IS READY ({} items)".format(len(df)))
                 print(df.head())
@@ -127,11 +136,19 @@ class Server:
         if (df is not None) and (len(df) > 0):
             df, err = preprocessData(df)
             if err is None:
+                success = None
                 for index, row in df.iterrows():
                     try:
                         print()
                         print("NOW, SAVING OBJECT OF INDEX -> {}".format(index))
-                        success = self.database.save_data_object(row.to_dict(), extra)
+                        if DATABASE_MODE == "MONGODB":
+                            success = self.database.save_data_object(row.to_dict(), extra)
+                        elif DATABASE_MODE == "MYSQL":
+                            SHOULD_HANDLE_UGCS_LOGIC = True
+                            if SHOULD_HANDLE_UGCS_LOGIC:
+                                success = self.mysql_database.handle_ugcs_logic(row.to_dict(), extra)
+                        else:
+                            raise Exception("INCORRECT DATABASE MODE SELECTED -> '{}'".format(DATABASE_MODE))
                         # WORK WITH success HOWEVER YOU WANT ..
                         print()
                     except Exception as e:

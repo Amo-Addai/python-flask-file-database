@@ -6,10 +6,11 @@ host, db_port, user, password, db = "localhost", 3306, "test", "password", "data
 
 
 class MySQLDatabase:
+    encryption = None, None
     conn, cursor = None, None
 
     def __init__(self):
-        pass
+        self.encryption = self.Encryption()
 
     def setup_mysql_db(self, app):  # MySQL configurations
         app.config['MYSQL_DATABASE_USER'] = user
@@ -63,7 +64,7 @@ class MySQLDatabase:
             print("ERROR -> {}".format(e))
         return None
 
-    def insert_data(self, table, columns=None, data=[]):
+    def insert_data_object(self, table, columns=None, data=[]):
         try:  # YOU CAN EXTRACT KEYS OF data FOR columns
             query = "INSERT INTO {} {} VALUES {}".format(table,
                                                          (("({})".format(columns)) if columns is not None else "(*)"),
@@ -78,7 +79,7 @@ class MySQLDatabase:
             print("ERROR -> {}".format(e))
         return None
 
-    def update_data(self):
+    def update_data(self, table, columns=None, data=[]):
         try:
             query = "UPDATE EMPLOYEE SET AGE = AGE + 1 WHERE SEX = '%c'" % ('M')
             # "UPDATE EMPLOYEE SET AGE = AGE + 1 WHERE SEX = '%c'" % ('M')
@@ -91,7 +92,7 @@ class MySQLDatabase:
             print("ERROR -> {}".format(e))
         return None
 
-    def delete_data(self):
+    def delete_data(self, table, columns=None):
         try:
             query = "DELETE FROM EMPLOYEE WHERE AGE > '%d'" % (20)
             # "DELETE FROM EMPLOYEE WHERE AGE > '%d'" % (20)
@@ -103,3 +104,27 @@ class MySQLDatabase:
         except Exception as e:
             print("ERROR -> {}".format(e))
         return None
+
+    def handle_ugcs_logic(self, obj, extra):  # HANDLE THE MAIN UGCS LOGIC RIGHT HERE ...
+        """
+        collection = self.validate_collection(extra)
+        if collection is not None:
+            obj = self.serialize_to("mongodb", obj)
+            print("OBJECT {} -> {}".format(type(obj), obj))
+            # NOW, YOU CAN SAVE THE DATA OBJECT
+            self.db[collection].insert(obj, check_keys=False)
+            # COZ YOU'RE LETTING MONGO-DB ALLOW '.' & '$' WITHIN YOUR KEYS, IT MIGHT HAVE SOME ISSUES
+            # ISSUES WHEN YOU'RE USING A FILTER WITH .find({'key.prop':'value'}) TO ACCESS INNER DOCUMENTS
+            return True
+        return False
+        """
+        # 1ST, VALIDATE THAT THIS FILE'S DATA IS THE ACTUAL REQUIRED EXCEL FILE :)
+        if (extra is not None) and ("table" in extra):
+            table = extra["collection"]
+            filename = extra["filename"] if ("filename" in extra) else self.default_filename
+            category = extra["category"] if ("category" in extra) else self.default_category
+            #
+        else:
+            print("SORRY, THERE IS NO table TO VALIDATE :(")
+        return None
+

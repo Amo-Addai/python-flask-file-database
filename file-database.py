@@ -170,7 +170,8 @@ def request_file():  # FIND THE RIGHT WAY TO RETRIEVE request.body
             print("Now attempting to send file '{}' to client for download -> {}".format(filename, filepath))
             return return_response(True)
         else:
-            response_message = "Server could not handle file-download request '{}' successfully".format(filename)
+            response_message = "Server could not handle file-download request '{}' successfully"\
+                .format(filename if (filename is not None) else extra["filename"])
         return return_response(False)
     return return_response(False)
 

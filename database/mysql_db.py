@@ -3,6 +3,7 @@ import pymysql
 
 mysql = MySQL()
 host, db_port, user, password, db = "localhost", 3306, "test", "password", "database_name"
+TABLES = ["courses", "schedules", "venues"]
 
 
 class MySQLDatabase:
@@ -10,7 +11,7 @@ class MySQLDatabase:
     conn, cursor = None, None
 
     def __init__(self):
-        self.encryption = self.Encryption()
+        pass
 
     def setup_mysql_db(self, app):  # MySQL configurations
         app.config['MYSQL_DATABASE_USER'] = user
@@ -106,25 +107,53 @@ class MySQLDatabase:
         return None
 
     def handle_ugcs_logic(self, obj, extra):  # HANDLE THE MAIN UGCS LOGIC RIGHT HERE ...
-        """
-        collection = self.validate_collection(extra)
-        if collection is not None:
-            obj = self.serialize_to("mongodb", obj)
-            print("OBJECT {} -> {}".format(type(obj), obj))
-            # NOW, YOU CAN SAVE THE DATA OBJECT
-            self.db[collection].insert(obj, check_keys=False)
-            # COZ YOU'RE LETTING MONGO-DB ALLOW '.' & '$' WITHIN YOUR KEYS, IT MIGHT HAVE SOME ISSUES
-            # ISSUES WHEN YOU'RE USING A FILTER WITH .find({'key.prop':'value'}) TO ACCESS INNER DOCUMENTS
-            return True
-        return False
-        """
-        # 1ST, VALIDATE THAT THIS FILE'S DATA IS THE ACTUAL REQUIRED EXCEL FILE :)
-        if (extra is not None) and ("table" in extra):
-            table = extra["collection"]
-            filename = extra["filename"] if ("filename" in extra) else self.default_filename
-            category = extra["category"] if ("category" in extra) else self.default_category
-            #
-        else:
-            print("SORRY, THERE IS NO table TO VALIDATE :(")
+        try:
+            """
+            collection = self.validate_collection(extra)
+            if collection is not None:
+                obj = self.serialize_to("mongodb", obj)
+                print("OBJECT {} -> {}".format(type(obj), obj))
+                # NOW, YOU CAN SAVE THE DATA OBJECT
+                self.db[collection].insert(obj, check_keys=False)
+                # COZ YOU'RE LETTING MONGO-DB ALLOW '.' & '$' WITHIN YOUR KEYS, IT MIGHT HAVE SOME ISSUES
+                # ISSUES WHEN YOU'RE USING A FILTER WITH .find({'key.prop':'value'}) TO ACCESS INNER DOCUMENTS
+                return True
+            return False
+            """
+            # 1ST, VALIDATE THAT THIS FILE'S DATA IS THE ACTUAL REQUIRED EXCEL FILE :)
+            if (extra is not None) and ("table" in extra) and (extra["table"] == "Examination"):
+                columns = ["EXAM_HALL", "COURSE_CODE", "PAPER_TITLE", "NO.", "INDEX_RANGE", "exam_time", "exam_date"]
+                # for c in columns:  # DECIDE IF THIS VALIDATION CODE SNIPPET IS EVEN NECESSARY AT ALL
+                #     if c not in obj.keys():  # DECIDE WHETHER THIS SHOULD RAISE AN ERROR TO STOP THE WHOLE FUNCTION
+                #         raise Exception("COLUMN '{}' NOT AVAILABLE WITHIN THE DATA".format(c))
+
+                # 1. RETRIEVE EXAM_HALL COLUMN
+                #    NB: SOME OF THE VALUES HERE HAVE OPTIONS (eg. 'N' BLOCK / K. FOLSON BLDG.')
+                #    BUT APPARENTLY, IT MIGHT NOT MATTER, COZ THAT'S THE SAME FORMAT WITHIN THE MYSQL DATABASE :)
+                exam_hall = obj["EXAM_HALL"]
+
+                # 2. ENTER 'venues' TABLE AND COMPARE 'EXAM_HALL' VALUE WITH ALL 'name' COLUMN VALUES
+                #    GET THE 'id' OF THE FOUND ROW, OR CREATE A NEW ROW, AND THEN GET THE 'id' (AUTO-INCREMENTED)
+
+
+                # 3. COMBINE id VALUE (AS 'venue_id') WITH obj DATA AND SAVE WITHIN THE 'schedules' TABLE
+                #    'provisional' & 'semester' COLUMNS SHOULD ALWAYS HAVE THE VALUE 1
+                #    CONCAT DATA OBJECT (USING THE MYSQLDB'S COLUMNS, NOT obj), IF IT'S NOT ALREADY WITHIN THE DATABASE, AND RETURN THE OBJ BACK
+                #    OBJECT MUST BE RETURNED COZ YOU NEED TO KEEP TRACK OF THEM, IN CASE A REVERT/UNDO ACTION IS MADE
+
+
+                # 4. PICK 'PAPER_TITLE' FROM obj & 'course_code' FROM 'schedules' ROW (OR 'COURSE_CODE' FROM obj, IF YOU WANT :)
+                #    THEN ENTER 'courses' TABLE, AND INSERT A NEW ROW WITH DATA, IF IT DOESN'T ALREADY EXIST :)
+                #    NB: 'PAPER_TITLE' -> 'title'; 'course_code' VALUE DETERMINES -> 'level' COLUMN; OTHER COLUMNS AUTO-GENERATED
+                #
+
+
+                # 5. RETURN SUCCESS RESULT, HOWEVER YOU SEE FIT :)
+
+
+            else:
+                print("SORRY, THERE IS NO table TO VALIDATE, OR THIS IS NOT THE 'Examination' TABLE :(")
+        except Exception as e:
+            print("ERROR -> {}".format(e))
         return None
 

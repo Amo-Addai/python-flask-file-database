@@ -132,6 +132,7 @@ class MySQLDatabase:
                 #    BUT APPARENTLY, IT MIGHT NOT MATTER, COZ THAT'S THE SAME FORMAT WITHIN THE MYSQL DATABASE :)
                 exam_hall = obj["EXAM_HALL"]
 
+
                 # 2. ENTER 'venues' TABLE AND COMPARE 'EXAM_HALL' VALUE WITH ALL 'name' COLUMN VALUES
                 #    GET THE 'id' OF THE FOUND ROW, OR CREATE A NEW ROW, AND THEN GET THE 'id' (AUTO-INCREMENTED)
 

@@ -33,6 +33,10 @@ class MySQLDatabase:
         self.conn.close()  # DISCONNECT FROM THE DATABASE
         return True
 
+    def handle_params(self, table=None, columns=None, query=None, limit=None, data=None):
+
+        return table, columns, query, limit, data
+
     def roll_back(self):  # Rollback in case there is any error
         self.conn.rollback()
 
@@ -108,6 +112,8 @@ class MySQLDatabase:
 
     def handle_ugcs_logic(self, obj, extra):  # HANDLE THE MAIN UGCS LOGIC RIGHT HERE ...
         try:
+            if "collection" in extra:  # USE THIS VALIDATION CODE
+                extra["table"] = extra["collection"]
             """
             collection = self.validate_collection(extra)
             if collection is not None:
@@ -132,10 +138,12 @@ class MySQLDatabase:
                 #    BUT APPARENTLY, IT MIGHT NOT MATTER, COZ THAT'S THE SAME FORMAT WITHIN THE MYSQL DATABASE :)
                 exam_hall = obj["EXAM_HALL"]
 
-
                 # 2. ENTER 'venues' TABLE AND COMPARE 'EXAM_HALL' VALUE WITH ALL 'name' COLUMN VALUES
                 #    GET THE 'id' OF THE FOUND ROW, OR CREATE A NEW ROW, AND THEN GET THE 'id' (AUTO-INCREMENTED)
-
+                o = self.get_data_object("venues", columns=["id"], query={"name": exam_hall})
+                if o is None:  # THEN, CREATE A NEW ROW, AND THEN GET THE 'id' (AUTO-INCREMENTED)
+                    pass
+                venue_id = o["id"]
 
                 # 3. COMBINE id VALUE (AS 'venue_id') WITH obj DATA AND SAVE WITHIN THE 'schedules' TABLE
                 #    'provisional' & 'semester' COLUMNS SHOULD ALWAYS HAVE THE VALUE 1
@@ -157,4 +165,3 @@ class MySQLDatabase:
         except Exception as e:
             print("ERROR -> {}".format(e))
         return None
-

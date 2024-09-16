@@ -47,6 +47,9 @@ class FileSystem:
                     out_file.write(tag)
                     out_file.write(ciphertext)
                 """
+                
+                pass
+                
                 # self.cipher = AES.new(self.key, AES.MODE_EAX)
                 # self.nonce = self.cipher.nonce
                 # ciphertext, self.tag = self.cipher.encrypt_and_digest(text)
